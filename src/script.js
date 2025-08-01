@@ -1,6 +1,6 @@
 // Featured banner event data (used for the banner "View more" button)
 const bannerEvent = {
-  image: 'images/banners/banner1.jpg',
+  image: 'images/banners/banner.jpg',
   month: 'AUG',
   day: '25',
   title: 'Featured Orientation Program',
@@ -8,7 +8,7 @@ const bannerEvent = {
   eventType: 'Seminar',
   faculty: 'Student Union',
   mode: 'Offline',
-  date: '2025-09-25',
+  date: '2025-10-02',
   description: 'Join us for the grand orientation program where you will get to know the university, faculty heads, and participate in fun activities to kick-start your journey.'
 };
 
