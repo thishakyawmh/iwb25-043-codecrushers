@@ -7,8 +7,17 @@
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
+
+  <!-- Loader Start -->
+<div id="loader">
+  <img src="images/loader.gif" alt="Loading..." />
+</div>
+<!-- Loader End -->
+
 
   <!-- Navigation -->
   <header class="navbar">
@@ -17,20 +26,24 @@
     </div>
     <nav class="nav-links" id="navLinks">
       <span id="greeting" class="greeting"><i class="fas fa-sun greeting-icon"></i></span>
-      <button class="my-account-btn"><i class="fas fa-user"></i> My Account</button>
+      <button id="authorize_button" class="google-calandar">
+        <img src="https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png" 
+             alt="Google Calendar" style="width:20px; height:20px;">
+        <span>Google Calendar</span>
+      </button>
+           
     </nav>
-    <div class="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
   </header>
 
   <!-- Banner Section -->
   <section class="banner-section">
     <div class="banner">
-      <img src="images/banners/banner1.jpg" alt="Event Banner" />
+      <img src="" alt="Event Banner" />
       <!-- Countdown and Button Overlay -->
       <div class="banner-overlay-container">
         <div class="countdown-header">STARTS ON</div>
         <div id="event-countdown" class="countdown"></div>
-        <button onclick="location.href='explore.html'" class="view-more-btn">View more</button>
+        <button id="bannerViewMore" class="view-more-btn">View more</button>
       </div>
     </div>
   </section>
@@ -77,6 +90,13 @@
           <option value="all">All</option>
           <option value="online">Online</option>
           <option value="offline">Offline</option>
+        </select>
+        <!-- Calendar filter -->
+        <select id="calendarFilter" title="Calendar">
+          <option value="all" disabled selected>Calendar</option>
+          <option value="all">All</option>
+          <option value="added">Added to Calendar</option>
+          <option value="not-added">Not Added</option>
         </select>
       </div>
     </div>

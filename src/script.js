@@ -1,42 +1,49 @@
-// Single event data
-const eventData = {
+// Featured banner event data (used for the banner "View more" button)
+const bannerEvent = {
   image: 'images/banners/banner1.jpg',
-  date: '2025-08-25T12:00:00'
+  month: 'AUG',
+  day: '25',
+  title: 'Featured Orientation Program',
+  subtitle: 'Welcome to New Students',
+  eventType: 'Seminar',
+  faculty: 'Student Union',
+  mode: 'Offline',
+  date: '2025-09-25',
+  description: 'Join us for the grand orientation program where you will get to know the university, faculty heads, and participate in fun activities to kick-start your journey.'
 };
 
-// Get user name from localStorage or prompt for it
-function getUserName() {
-  let userName = localStorage.getItem('userName');
-  if (!userName) {
-    userName = prompt('Please enter your name:');
-    if (userName && userName.trim()) {
-      localStorage.setItem('userName', userName.trim());
-    } else {
-      userName = 'User'; // Default name if user cancels or enters empty
-    }
-  }
-  return userName;
+// Set banner image and text from bannerEvent
+const bannerImg = document.querySelector('.banner img');
+if (bannerImg) {
+  bannerImg.src = bannerEvent.image;
+  bannerImg.alt = bannerEvent.title;
 }
+
+// Track events added to calendar
+const addedEvents = new Set();
+
+//  user name (set here)
+let USER_NAME = 'Thishkya';
 
 function updateGreeting() {
   const now = new Date();
   const hour = now.getHours();
-  const userName = getUserName();
+  const userName = USER_NAME + "!";
   let greeting = '';
   
   if (hour < 12) {
-    greeting = `Good Morning, ${userName}`;
+    greeting = `Good morning, ${userName}`;
   } else if (hour < 17) {
-    greeting = `Good Afternoon, ${userName}`;
+    greeting = `Good afternoon, ${userName}`;
   } else {
-    greeting = `Good Evening, ${userName}`;
+    greeting = `Good evening, ${userName}`;
   }
   
   document.getElementById('greeting').textContent = greeting;
 }
 
 function updateCountdown() {
-  const target = new Date(eventData.date);
+  const target = new Date(bannerEvent.date);
   const now = new Date();
   const diff = target - now;
   const el = document.getElementById("event-countdown");
@@ -90,6 +97,10 @@ function openModal(event) {
   modalMode.textContent = event.mode;
   modalDescription.textContent = event.description || `Join us for ${event.title} organized by ${event.faculty}. This ${event.eventType} will be conducted ${event.mode}.`;
 
+  // Set modal button state based on calendar
+  const modalBtn = modal.querySelector('.add-to-calendar-btn');
+  syncButtonState(modalBtn, addedEvents.has(event.title));
+
   modal.style.display = 'block';
   document.body.style.overflow = 'hidden'; // Prevent background scrolling
 }
@@ -101,33 +112,62 @@ function closeModal() {
 }
 
 function addToCalendar() {
-  const button = document.querySelector('.add-to-calendar-btn');
-  const icon = button.querySelector('i');
-  
-  if (button.classList.contains('removed')) {
-    // Remove from calendar
-    button.classList.remove('removed');
-    button.innerHTML = '<i class="fas fa-plus"></i> Add to Calendar';
-    alert('Event removed from calendar!');
+  const modalBtn = document.querySelector('#eventModal .add-to-calendar-btn');
+  const eventTitle = document.getElementById('modalEventTitle').textContent;
+  const isCurrentlyAdded = addedEvents.has(eventTitle);
+  if (isCurrentlyAdded) {
+    addedEvents.delete(eventTitle);
   } else {
-    // Add to calendar
-    button.classList.add('removed');
-    button.innerHTML = '<i class="fas fa-minus"></i> Remove from Calendar';
-    alert('Event added to calendar!');
+    addedEvents.add(eventTitle);
+  }
+  // Update modal button state
+  syncButtonState(modalBtn, !isCurrentlyAdded);
+
+  // Update corresponding card button
+  const cardBtn = document.querySelector(`.card-calendar-btn[data-title="${eventTitle}"]`);
+  if(cardBtn){
+    syncButtonState(cardBtn, !isCurrentlyAdded);
+  }
+}
+
+function syncButtonState(btn, isAdded){
+  if(isAdded){
+    btn.classList.add('removed');
+    btn.innerHTML = '<i class="fas fa-minus"></i> Remove from Calendar';
+  }else{
+    btn.classList.remove('removed');
+    btn.innerHTML = '<i class="fas fa-plus"></i> Add to Calendar';
   }
 }
 
 function toggleCalendar(button, eventTitle) {
-  if (button.classList.contains('removed')) {
-    // Remove from calendar
-    button.classList.remove('removed');
-    button.innerHTML = '<i class="fas fa-plus"></i> Add to Calendar';
-    alert(`${eventTitle} removed from calendar!`);
+  const isCurrentlyAdded = addedEvents.has(eventTitle);
+  if (isCurrentlyAdded) {
+    addedEvents.delete(eventTitle);
   } else {
-    // Add to calendar
-    button.classList.add('removed');
-    button.innerHTML = '<i class="fas fa-minus"></i> Remove from Calendar';
-    alert(`${eventTitle} added to calendar!`);
+    addedEvents.add(eventTitle);
+  }
+  // Update the clicked button
+  syncButtonState(button, !isCurrentlyAdded);
+
+  // Update modal button if modal open for same event
+  const modal = document.getElementById('eventModal');
+  if(modal.style.display === 'block'){
+    const currentModalTitle = document.getElementById('modalEventTitle').textContent;
+    if(currentModalTitle === eventTitle){
+      const modalBtn = modal.querySelector('.add-to-calendar-btn');
+      syncButtonState(modalBtn, !isCurrentlyAdded);
+    }
+  }
+}
+
+// Hamburger menu toggle for mobile navigation
+function toggleMenu() {
+  const navLinks = document.getElementById('navLinks');
+  if (navLinks.style.display === 'flex' || navLinks.style.display === '') {
+    navLinks.style.display = 'none';
+  } else {
+    navLinks.style.display = 'flex';
   }
 }
 
@@ -268,6 +308,7 @@ function renderEventCards() {
   const eventTypeFilter = document.getElementById('eventTypeFilter').value;
   const facultyFilter = document.getElementById('facultyFilter').value;
   const modeFilter = document.getElementById('modeFilter').value;
+  const calendarFilter = document.getElementById('calendarFilter').value;
 
   // Filter events based on criteria
   const filteredEvents = events.filter(event => {
@@ -323,6 +364,10 @@ function renderEventCards() {
       if (modeMapping[modeFilter] !== event.mode) return false;
     }
 
+    // Calendar filter
+    if(calendarFilter === 'added' && !addedEvents.has(event.title)) return false;
+    if(calendarFilter === 'not-added' && addedEvents.has(event.title)) return false;
+
     return true;
   });
 
@@ -366,10 +411,6 @@ function renderEventCards() {
         <div class="event-image">
           <img src="${e.image}" alt="${e.title}" />
           <div class="price">${remainingText}</div>
-          <div class="icons">
-            <span></span>
-            <span>❤️</span>
-          </div>
         </div>
         <div class="event-info">
           <div class="event-date">
@@ -387,8 +428,8 @@ function renderEventCards() {
           </div>
         </div>
         <div class="event-actions">
-          <button class="card-calendar-btn" onclick="event.stopPropagation(); toggleCalendar(this, '${e.title}')">
-            <i class="fas fa-plus"></i> Add to Calendar
+          <button class="card-calendar-btn ${addedEvents.has(e.title) ? 'removed' : ''}" data-title="${e.title}" onclick="event.stopPropagation(); toggleCalendar(this, '${e.title}')">
+            ${addedEvents.has(e.title) ? '<i class="fas fa-minus"></i> Remove from Calendar' : '<i class="fas fa-plus"></i> Add to Calendar'}
           </button>
         </div>
       </div>
@@ -398,7 +439,7 @@ function renderEventCards() {
 
 // Add event listeners for filters
 function initializeFilters() {
-  const filters = ['dateFilter', 'eventTypeFilter', 'facultyFilter', 'modeFilter'];
+  const filters = ['dateFilter', 'eventTypeFilter', 'facultyFilter', 'modeFilter', 'calendarFilter'];
   filters.forEach(filterId => {
     document.getElementById(filterId).addEventListener('change', renderEventCards);
   });
@@ -410,3 +451,60 @@ updateCountdown();
 renderEventCards();
 initializeFilters();
 setInterval(updateCountdown, 1000);
+
+// Attach modal opening to banner View More button
+const bannerBtn = document.getElementById('bannerViewMore');
+bannerBtn.addEventListener('click', function(){
+  openModal(bannerEvent);
+});
+
+// Google Calendar API
+
+
+const CLIENT_ID = 'Add the client ID here'; // Replace with your actual OAuth2 client ID
+const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
+
+
+function authenticate() {
+  return gapi.auth2.getAuthInstance()
+    .signIn({ scope: SCOPES })
+    .then(() => {
+      console.log("✅ Sign-in successful");
+      return gapi.client.request({
+        'path': 'https://www.googleapis.com/oauth2/v3/userinfo'
+      });
+    })
+    .then(response => {
+      USER_NAME = response.result.name || response.result.email;
+      console.log("👤 USER_NAME =", USER_NAME);
+
+      // Optional: now open Google Calendar
+      window.open("https://calendar.google.com", "_blank");
+    })
+    .catch(err => {
+      console.error("❌ Error during authentication or user info fetch", err);
+    });
+}
+
+function initClient() {
+  gapi.client.init({
+    clientId: CLIENT_ID,
+    scope: SCOPES
+  });
+}
+
+gapi.load('client:auth2', initClient);
+
+document.getElementById("authorize_button").addEventListener("click", authenticate);
+
+
+// Loader (Do not Change)
+  window.addEventListener("load", () => {
+    const loader = document.getElementById("loader");
+    loader.classList.add("hidden");
+
+    setTimeout(() => {
+      loader.style.display = "none";
+    }, 2000); 
+  });
+

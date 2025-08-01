@@ -1,6 +1,6 @@
 :root {
-  --primary: #6a5acd;
-  --accent: #00c3ff;
+  --primary: #695aca;
+  --accent: #3d2f97;
   --light-bg: #f8f9fa;
   --text-dark: #1a1a1a;
   --text-muted: #7a7a7a;
@@ -21,6 +21,33 @@ body {
   margin: 0; /* Remove side margins */
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }
+
+
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease;
+}
+
+#loader img {
+  width: 90px;
+  height: 90px;
+}
+
+
+#loader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 
 .container {
   padding-left: 0;
@@ -43,9 +70,11 @@ body {
   border: none;
   width: 100%; /* Changed from 100vw to prevent horizontal scrolling */
   box-sizing: border-box;
-  margin-top: 2px;
+  margin-top: 8px;
   margin-bottom: 5px;
 }
+
+
 
 .logo {
   margin-left: calc((100vw - 1280px) / 2); /* Align logo with banner left edge */
@@ -73,23 +102,34 @@ body {
   letter-spacing: 0.5px;
 }
 
-.my-account-btn {
-  background: var(--primary);
-  color: #fff;
+.google-calandar {
+  display: flex;
+  align-items: center;
   border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1.2rem; /* Decreased padding */
-  font-size: 0.85rem; /* Decreased from 1rem */
+  border-radius: 10px;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.9rem;
   font-weight: 600;
+  font-family: inherit;
+  color: white;
   cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  box-shadow: 0 2px 8px rgba(106,90,205,0.15);
+  background: linear-gradient(135deg, #4285F4, #34A853);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+  gap: 10px;
 }
 
-.my-account-btn:hover {
-  background: var(--accent);
-  transform: translateY(-1px);
+.google-calandar:hover {
+  background: linear-gradient(135deg, #357ae8, #2c9c49);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
+
+.google-calandar:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
 
 /* Banner */
 .banner-section {
@@ -229,7 +269,9 @@ body {
   display: flex;
   gap: 1rem;
   margin: 1rem 0;
+  justify-content: center; /* center horizontally */
 }
+
 
 .filters select {
   padding: 0.9rem 1.8rem;
@@ -389,23 +431,6 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.icons {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  display: flex;
-  gap: 0.7rem;
-}
-
-.icons span {
-  background: #fff;
-  border-radius: 50%;
-  padding: 8px;
-  font-size: 1.1rem;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
 .event-info {
   display: flex;
   padding: 1.3rem 1.5rem 1.1rem 1.5rem;
@@ -468,16 +493,6 @@ body {
   font-weight: 400;
 }
 
-/* Hamburger Menu */
-.hamburger {
-  display: none; /* Hidden by default on desktop */
-  cursor: pointer;
-  font-size: 1.5rem;
-  color: #fff;
-  background: none;
-  border: none;
-  padding: 0.5rem;
-}
 
 /* Modal Styles */
 .modal {
@@ -495,7 +510,7 @@ body {
 
 .modal-content {
   background-color: #fff;
-  margin: 8% auto; /* Reduced from 5% */
+  margin: 4% auto;
   padding: 0;
   border-radius: 20px;
   width: 90%;
@@ -503,6 +518,8 @@ body {
   box-shadow: 0 25px 80px rgba(0,0,0,0.25);
   position: relative;
   border: 1px solid rgba(106,90,205,0.1);
+  max-height: 90vh; /* Allow scroll if content exceeds viewport */
+  overflow-y: auto;
 }
 
 .modal-header {
@@ -587,7 +604,8 @@ body {
 }
 
 .modal-description {
-  padding: 1.5rem 2rem 1rem 2rem;
+padding: 1.5rem 2rem 1rem 2rem;
+font-size: 0.85rem;
 }
 
 .modal-description p {
@@ -702,8 +720,8 @@ body {
 /* Responsive */
 @media (max-width: 1200px) {
   .event-cards {
-    grid-template-columns: repeat(2, 1fr);
-    max-width: 800px;
+    grid-template-columns: 1fr;
+    max-width: 100%;
   }
   .banner-search-bar {
     min-width: 350px;
@@ -713,36 +731,221 @@ body {
 }
 
 @media (max-width: 800px) {
-  .hamburger {
-    display: block; /* Show hamburger on mobile */
+  .container {
+    padding-left: 16px;
+    padding-right: 16px;
   }
-  
+
   .nav-links {
     display: none; /* Hide nav links on mobile (will be shown via JavaScript) */
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: #fff;
+    flex-direction: column;
+    width: 100vw;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    z-index: 2001;
+    padding: 1rem 0;
   }
-  
   .event-cards {
     grid-template-columns: 1fr;
-    max-width: 400px;
+    gap: 1.5rem;
+    max-width: 100%;
   }
   .banner-section {
-    height: 220px;
+    height: 300px;
+    margin-left: 16px;
+    margin-right: 16px;
   }
   .banner img {
-    height: 220px;
+    height: 300px;
   }
-  .banner-overlay-bar {
+  .banner-overlay-container {
     min-width: 200px;
     flex-direction: column;
     gap: 0.7rem;
     left: 50%;
-    bottom: -60px;
+    bottom: 16px;
     transform: translateX(-50%);
   }
   .upcoming-events-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.7rem;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 600px) {
+  /* Center modal on mobile */
+  .modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-content {
+    margin: 8 auto; /* override previous margins */
+    max-height: 90vh;
+  }
+
+  .container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.5rem 0;
+  }
+  .logo {
+    margin-left: 10px;
+    margin-right: 0;
+  }
+  .banner-section {
+    height: 220px;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+  }
+  .banner img {
+    height: 220px;
+    border-radius: 12px;
+  }
+  .countdown-label {
+    font-size: 0.6rem;
+  }
+  .banner-overlay-container {
+    min-width: 0;
+    padding: 1rem 0.5rem;
+    gap: 0.7rem;
+    border-radius: 8px;
+  }
+  .countdown-header {
+    font-size: 1rem;
+  }
+  .countdown {
+    gap: 0.3rem;
+    font-size: 0.8rem;
+  }
+  .countdown-block {
+    width: 38px;
+    height: 38px;
+    font-size: 0.7rem;
+    padding: 0.2rem;
+  }
+  .countdown-label {
+    font-size: 0.4rem;
+  }
+  .view-more-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+  .upcoming-events-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin: 1.5rem 0 1rem 0;
+  }
+  .upcoming-events h2 {
+    font-size: 1.2rem;
+  }
+  .filters {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .filters select {
+    min-width: 0;
+    width: 100%;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+  }
+  .event-cards {
+    gap: 1rem;
+    max-width: 100%;
+  }
+  .event-card {
+    min-height: 220px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+  }
+  .event-image {
+    height: 150px;
+  }
+  .event-image img {
+    border-radius: 10px 10px 0 0;
+  }
+  .event-info {
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 0.7rem 0.7rem 0.5rem 0.7rem;
+    align-items: center;
+  }
+  .event-date {
+    min-width: 32px;
+    margin-right: 0.4rem;
+  }
+  .event-date .month {
+    font-size: 0.8rem;
+  }
+  .event-date .day {
+    font-size: 1.1rem;
+  }
+  .event-details h4 {
+    font-size: 0.9rem;
+  }
+  .event-details p {
+    font-size: 0.75rem;
+  }
+  .event-tags {
+    gap: 0.2rem;
+    font-size: 0.8rem;
+  }
+  .event-actions {
+    padding: 0 0.7rem 0.7rem 0.7rem;
+  }
+  .card-calendar-btn {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.8rem;
+  }
+  .modal-content {
+    width: 98vw;
+    max-width: 99vw;
+    margin: 8% auto;
+    border-radius: 10px;
+    padding: 0;
+  }
+  .modal-header {
+    padding: 1rem 1rem 0.7rem 1rem;
+    border-radius: 10px 10px 0 0;
+  }
+  .modal-image img {
+    height: 120px;
+  }
+  .modal-details {
+    flex-direction: row;
+    gap: 0.3rem;
+    padding: 0.5rem 1rem;
+    margin: 0 1rem;
+    font-size: 0.8rem;
+    justify-content: space-between;
+  }
+  .modal-divider {
+    margin: 0 1rem;
+  }
+  .modal-description {
+    padding: 1rem 1rem 0.5rem 1rem;
+  }
+  .modal-actions {
+    padding: 0 1rem 1rem 1rem;
+  }
+  .add-to-calendar-btn {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  .price {
+    font-size: 0.8rem;
   }
 }
 
