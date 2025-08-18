@@ -1,139 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Univents</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="https://apis.google.com/js/api.js"></script>
-</head>
-<body>
-
-  <!-- Loader Start -->
-<div id="loader">
-  <img src="images/loader.gif" alt="Loading..." />
-</div>
-<!-- Loader End -->
-
-
-  <!-- Navigation -->
-  <header class="navbar">
-    <div class="logo">
-      <img src="images/logo.jpg" alt="Univents Logo" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Univents</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+  </head>
+  <body>
+    <!-- Loader Start -->
+    <div id="loader">
+      <img src="images/loader.gif" alt="Loading..." />
     </div>
-    <nav class="nav-links" id="navLinks">
-      <span id="greeting" class="greeting"><i class="fas fa-sun greeting-icon"></i></span>
-      <button id="authorize_button" class="google-calandar">
-        <img src="https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png" 
-             alt="Google Calendar" style="width:20px; height:20px;">
-        <span>Google Calendar</span>
-      </button>
-           
-    </nav>
-  </header>
+    <!-- Loader End -->
 
-  <!-- Banner Section -->
-  <section class="banner-section">
-    <div class="banner">
-      <img src="" alt="Event Banner" />
-      <!-- Countdown and Button Overlay -->
-      <div class="banner-overlay-container">
-        <div class="countdown-header">STARTS ON</div>
-        <div id="event-countdown" class="countdown"></div>
-        <button id="bannerViewMore" class="view-more-btn">View more</button>
+    <!-- Navigation -->
+    <header class="navbar">
+      <div class="logo">
+        <img src="images/logo.jpg" alt="Univents Logo" />
       </div>
-    </div>
-  </section>
-
-  <!-- Upcoming Events -->
-  <section class="upcoming-events container">
-    <div class="upcoming-events-header">
-      <h2>Upcoming Events</h2>
-      <div class="filters">
-        <select id="dateFilter" title="Date">
-          <option value="all" disabled selected>Date</option>
-          <option value="all">All</option>
-          <option value="past">Past</option>
-          <option value="today">Today</option>
-          <option value="week">This Week</option>
-          <option value="month">This Month</option>
-        </select>
-        <select id="eventTypeFilter" title="Event Type">
-          <option value="all" disabled selected>Event Type</option>
-          <option value="all">All</option>
-          <option value="workshop">Workshop</option>
-          <option value="seminar">Seminar</option>
-          <option value="competition">Competition</option>
-          <option value="cultural">Cultural</option>
-          <option value="webinar">Webinar</option>
-          <option value="other">Other</option>
-        </select>
-        <select id="facultyFilter" title="Faculty / Organizer">
-          <option value="all" disabled selected>Faculty / Organizer</option>
-          <option value="all">All</option>
-          <option value="engineering">Faculty of Engineering</option>
-          <option value="medicine">Faculty of Medicine</option>
-          <option value="technology">Faculty of Technology</option>
-          <option value="social">Faculty of Social Science</option>
-          <option value="management">Faculty of Management</option>
-          <option value="agriculture">Faculty of Agriculture</option>
-          <option value="computing">Faculty of Computing</option>
-          <option value="student-union">Student Union</option>
-          <option value="clubs">IEEE / AIESEC / GDSC clubs</option>
-          <option value="other">Other</option>
-        </select>
-        <select id="modeFilter" title="Mode">
-          <option value="all" disabled selected>Mode</option>
-          <option value="all">All</option>
-          <option value="online">Online</option>
-          <option value="offline">Offline</option>
-        </select>
-        <!-- Calendar filter -->
-        <select id="calendarFilter" title="Calendar">
-          <option value="all" disabled selected>Calendar</option>
-          <option value="all">All</option>
-          <option value="added">Added to Calendar</option>
-          <option value="not-added">Not Added</option>
-        </select>
-      </div>
-    </div>
-    <div class="event-cards" id="eventCards">
-      <!-- Event cards inserted via JavaScript -->
-    </div>
-  </section>
-
-  <!-- Event Modal -->
-  <div id="eventModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modalEventTitle">Event Name</h3>
-        <button class="close-btn" onclick="closeModal()">×</button>
-      </div>
-      <div class="modal-image">
-        <img id="modalEventImage" src="" alt="Event Image" />
-      </div>
-      <div class="modal-details">
-        <span id="modalFaculty">Faculty / Organizer</span>
-        <span class="separator">|</span>
-        <span id="modalEventType">Event type</span>
-        <span class="separator">|</span>
-        <span id="modalMode">Mode</span>
-      </div>
-      <hr class="modal-divider">
-      <div class="modal-description">
-        <p id="modalDescription">Description about the event.......</p>
-      </div>
-      <div class="modal-actions">
-        <button class="add-to-calendar-btn" onclick="addToCalendar()">
-          <i class="fas fa-plus"></i> Add to Calendar
+      <nav class="nav-links" id="navLinks">
+        <span id="greeting" class="greeting"
+          ><i class="fas fa-sun greeting-icon"></i
+        ></span>
+        <button id="authorize_button" class="google-calandar">
+          <img
+            src="https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png"
+            alt="Google Calendar"
+            style="width: 20px; height: 20px"
+          />
+          <span>Google Calendar</span>
         </button>
+      </nav>
+    </header>
+
+    <!-- Banner Section -->
+    <section class="banner-section">
+      <div class="banner">
+        <img src="" alt="Event Banner" />
+        <!-- Countdown and Button Overlay -->
+        <div class="banner-overlay-container">
+          <div class="countdown-header">STARTS ON</div>
+          <div id="event-countdown" class="countdown"></div>
+          <button id="bannerViewMore" class="view-more-btn">View more</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Upcoming Events -->
+    <section class="upcoming-events container">
+      <div class="upcoming-events-header">
+        <h2>Upcoming Events</h2>
+        <div class="filters">
+          <select id="dateFilter" title="Date">
+            <option value="all" disabled selected>Date</option>
+            <option value="all">All</option>
+            <option value="past">Past</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+          </select>
+          <select id="eventTypeFilter" title="Event Type">
+            <option value="all" disabled selected>Event Type</option>
+            <option value="all">All</option>
+            <option value="workshop">Workshop</option>
+            <option value="seminar">Seminar</option>
+            <option value="competition">Competition</option>
+            <option value="cultural">Cultural</option>
+            <option value="webinar">Webinar</option>
+            <option value="other">Other</option>
+          </select>
+          <select id="facultyFilter" title="Faculty / Organizer">
+            <option value="all" disabled selected>Faculty / Organizer</option>
+            <option value="all">All</option>
+            <option value="engineering">Faculty of Engineering</option>
+            <option value="medicine">Faculty of Medicine</option>
+            <option value="technology">Faculty of Technology</option>
+            <option value="social">Faculty of Social Science</option>
+            <option value="management">Faculty of Management</option>
+            <option value="agriculture">Faculty of Agriculture</option>
+            <option value="computing">Faculty of Computing</option>
+            <option value="student-union">Student Union</option>
+            <option value="clubs">IEEE / AIESEC / GDSC clubs</option>
+            <option value="other">Other</option>
+          </select>
+          <select id="modeFilter" title="Mode">
+            <option value="all" disabled selected>Mode</option>
+            <option value="all">All</option>
+            <option value="online">Online</option>
+            <option value="offline">Offline</option>
+          </select>
+          <!-- Calendar filter -->
+          <select id="calendarFilter" title="Calendar">
+            <option value="all" disabled selected>Calendar</option>
+            <option value="all">All</option>
+            <option value="added">Added to Calendar</option>
+            <option value="not-added">Not Added</option>
+          </select>
+        </div>
+      </div>
+      <div class="event-cards" id="eventCards">
+        <!-- Event cards inserted via JavaScript -->
+      </div>
+    </section>
+
+    <!-- Event Modal -->
+    <div id="eventModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalEventTitle">Event Name</h3>
+          <button class="close-btn" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-image">
+          <img id="modalEventImage" src="" alt="Event Image" />
+        </div>
+        <div class="modal-details">
+          <span id="modalFaculty">Faculty / Organizer</span>
+          <span class="separator">|</span>
+          <span id="modalEventType">Event type</span>
+          <span class="separator">|</span>
+          <span id="modalMode">Mode</span>
+        </div>
+        <hr class="modal-divider" />
+        <div class="modal-description">
+          <p id="modalDescription">Description about the event.......</p>
+        </div>
+        <div class="modal-actions">
+          <button class="add-to-calendar-btn" onclick="addToCalendar()">
+            <i class="fas fa-plus"></i> Add to Calendar
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <script src="script.js"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
