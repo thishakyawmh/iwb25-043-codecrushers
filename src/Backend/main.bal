@@ -1,4 +1,5 @@
 import ballerina/http;
+import ballerina/uuid;
 //import ballerina/uuid;
 import ballerinax/mongodb;
 
@@ -19,7 +20,7 @@ final mongodb:Client mongoDb = check new ({
 @http:ServiceConfig {
     cors: {
         allowOrigins: ["*"],
-        allowMethods: ["GET", "POST"]
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 }
 }
 
@@ -42,22 +43,22 @@ service on new http:Listener(9091) {
     //     return getMovie(self.moviesDb, id);
     // }
 
-    // resource function post movies(MovieInput input) returns Movie|error {
-    //     string id = uuid:createType1AsString();
-    //     Movie movie = {id, ...input};
-    //     mongodb:Collection movies = check self.moviesDb->getCollection("movies");
-    //     check movies->insertOne(movie);
-    //     return movie;
-    // }
+    resource function post events(EventInput newEvent) returns string|error {
+        string id = uuid:createType1AsString();
+        Event event = {id, ...newEvent};
+        mongodb:Collection events = check self.Univents->getCollection("Events");
+        check events->insertOne(event);
+        return id;
+    }
 
-    // resource function put movies/[string id](MovieUpdate update) returns Movie|error {
-    //     mongodb:Collection movies = check self.moviesDb->getCollection("movies");
-    //     mongodb:UpdateResult updateResult = check movies->updateOne({id}, {set: update});
-    //     if updateResult.modifiedCount != 1 {
-    //         return error(string `Failed to update the movie with id ${id}`);
-    //     }
-    //     return getMovie(self.moviesDb, id);
-    // }
+    resource function put events/[string id](EventUpdate update) returns Event|error {
+        mongodb:Collection events = check self.Univents->getCollection("Events");
+        mongodb:UpdateResult updateResult = check events->updateOne({id}, {set: update});
+        if updateResult.modifiedCount != 1 {
+            return error(string `Failed to update the event with id ${id}`);
+        }
+        return getEvent(self.Univents, id);
+    }
 
     // resource function delete movies/[string id]() returns string|error {
     //     mongodb:Collection movies = check self.moviesDb->getCollection("movies");
@@ -69,13 +70,13 @@ service on new http:Listener(9091) {
     // }
 }
 
-// isolated function getMovie(mongodb:Database moviesDb, string id) returns Movie|error {
-//     mongodb:Collection movies = check moviesDb->getCollection("movies");
-//     stream<Movie, error?> findResult = check movies->find({id});
-//     Movie[] result = check from Movie m in findResult
-//         select m;
-//     if result.length() != 1 {
-//         return error(string `Failed to find a movie with id ${id}`);
-//     }
-//     return result[0];
-// }
+isolated function getEvent(mongodb:Database Univents, string id) returns Event|error {
+    mongodb:Collection events = check Univents->getCollection("Events");
+    stream<Event, error?> findResult = check events->find({id});
+    Event[] result = check from Event e in findResult
+        select e;
+    if result.length() != 1 {
+        return error(string `Failed to find a movie with id ${id}`);
+    }
+    return result[0];
+}

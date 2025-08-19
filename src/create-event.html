@@ -4,12 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create New Event - Univents</title>
-    <!-- Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <!-- Link to your new external stylesheet -->
     <link rel="stylesheet" href="create-event-style.css" />
   </head>
   <body>
@@ -19,7 +17,7 @@
         <p>Fill out the details below to add a new event to the platform.</p>
       </div>
       <form id="createEventForm" action="#" method="POST">
-        <!-- Event Title -->
+        <!-- Form fields remain the same -->
         <div class="form-group">
           <label for="title" class="form-label">Event Title</label>
           <input
@@ -31,8 +29,6 @@
             placeholder="e.g., Annual Tech Conference"
           />
         </div>
-
-        <!-- Event Subtitle -->
         <div class="form-group">
           <label for="subtitle" class="form-label">Subtitle</label>
           <input
@@ -44,8 +40,6 @@
             placeholder="e.g., Exploring Future Technologies"
           />
         </div>
-
-        <!-- Description -->
         <div class="form-group">
           <label for="description" class="form-label">Description</label>
           <textarea
@@ -57,8 +51,6 @@
             placeholder="Provide a detailed description of the event..."
           ></textarea>
         </div>
-
-        <!-- Grid for Date, Mode, Event Type -->
         <div class="form-grid">
           <div class="form-group">
             <label for="date" class="form-label">Date</label>
@@ -94,26 +86,29 @@
             </select>
           </div>
         </div>
-
-        <!-- Faculty / Organizer -->
         <div class="form-group">
           <label for="faculty" class="form-label">Faculty / Organizer</label>
           <select id="faculty" name="faculty" required class="form-select">
-            <option value="select">--Select--</option>
-            <option value="engineering">Faculty of Engineering</option>
-            <option value="medicine">Faculty of Medicine</option>
-            <option value="technology">Faculty of Technology</option>
-            <option value="social">Faculty of Social Science</option>
-            <option value="management">Faculty of Management</option>
-            <option value="agriculture">Faculty of Agriculture</option>
-            <option value="computing">Faculty of Computing</option>
-            <option value="student-union">Student Union</option>
-            <option value="clubs">IEEE / AIESEC / GDSC clubs</option>
-            <option value="other">Other</option>
+            <option value="Faculty of Engineering">
+              Faculty of Engineering
+            </option>
+            <option value="Faculty of Medicine">Faculty of Medicine</option>
+            <option value="Faculty of Technology">Faculty of Technology</option>
+            <option value="Faculty of Social Science">
+              Faculty of Social Science
+            </option>
+            <option value="Faculty of Management">Faculty of Management</option>
+            <option value="Faculty of Agriculture">
+              Faculty of Agriculture
+            </option>
+            <option value="Faculty of Computing">Faculty of Computing</option>
+            <option value="Student Union">Student Union</option>
+            <option value="IEEE / AIESEC / GDSC clubs">
+              IEEE / AIESEC / GDSC clubs
+            </option>
+            <option value="Other">Other</option>
           </select>
         </div>
-
-        <!-- Image File Upload -->
         <div class="form-group">
           <label for="image" class="form-label">Event Image</label>
           <input
@@ -125,8 +120,6 @@
             accept="image/png, image/jpeg, image/webp"
           />
         </div>
-
-        <!-- Hidden fields for month and day, will be auto-filled by JS -->
         <input type="hidden" id="month" name="month" />
         <input type="hidden" id="day" name="day" />
 
@@ -137,58 +130,6 @@
       </form>
     </div>
 
-    <script>
-      // JavaScript to automatically set the month and day from the selected date
-      document.getElementById("date").addEventListener("change", function () {
-        if (this.value) {
-          const selectedDate = new Date(this.value);
-          const month = selectedDate
-            .toLocaleString("en-US", { month: "short" })
-            .toUpperCase();
-          const day = selectedDate.getDate();
-
-          document.getElementById("month").value = month;
-          document.getElementById("day").value = day;
-        }
-      });
-
-      // Handle form submission
-      document
-        .getElementById("createEventForm")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
-
-          // When using file uploads, it's best to send data using FormData
-          const formData = new FormData(this);
-
-          // You can see the data in the console
-          for (let [key, value] of formData.entries()) {
-            console.log(`${key}:`, value);
-          }
-
-          // The logic to send this FormData to your Ballerina backend would go here.
-          // Note that you would not stringify the body when sending FormData.
-          /*
-            fetch('http://localhost:9091/events', {
-                method: 'POST',
-                body: formData, // Send the FormData object directly
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                alert('Event created successfully!');
-                window.location.href = 'index.html';
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                alert('Failed to create event.');
-            });
-            */
-
-          alert(
-            "Form submitted! (See console for data). You will need to adjust your backend to handle a file upload."
-          );
-        });
-    </script>
+    <script src="create-event-script.js"></script>
   </body>
 </html>
