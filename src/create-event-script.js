@@ -61,12 +61,11 @@ document.getElementById('createEventForm').addEventListener('submit', function(e
         })
         .then(data => {
             console.log('Success:', data);
-            alert('Event created successfully!');
-            window.location.href = 'index.html';
+            showPopup("Success", "Event created successfully!", "index.html");
         })
         .catch((error) => {
             console.error('Error:', error);
-            alert('Failed to create event. Please check the console for details.');
+            showPopup("Error", "Failed to create event. Please check the console for details.");
         });
     };
 

@@ -9,127 +9,218 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="create-event-style.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
   </head>
   <body>
-    <div class="form-container">
-      <div class="form-header">
-        <h2>Create a New Event</h2>
-        <p>Fill out the details below to add a new event to the platform.</p>
+    <!-- Navigation Header -->
+    <header class="navbar">
+      <div class="logo">
+        <a href="index.html"><img src="images/logo.jpg" alt="Univents Logo" /></a>
       </div>
-      <form id="createEventForm" action="#" method="POST">
-        <!-- Form fields remain the same -->
-        <div class="form-group">
-          <label for="title" class="form-label">Event Title</label>
-          <input
-            id="title"
-            name="title"
-            type="text"
-            required
-            class="form-input"
-            placeholder="e.g., Annual Tech Conference"
+      <nav class="nav-links" id="navLinks">
+        <span id="greeting" class="greeting">
+          <i class="fas fa-sun greeting-icon"></i>
+        </span>
+        <!-- 'Create Event' Button -->
+        <a href="create-event.html" class="create-event-btn">
+          <i class="fas fa-plus"></i>
+          <span>Create Event</span>
+        </a>
+        <button id="authorize_button" class="google-calandar">
+          <img
+            src="https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png"
+            alt="Google Calendar"
+            style="width: 20px; height: 20px"
           />
+          <span>Google Calendar</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+      <div class="form-container">
+        <div class="form-header">
+          <h2>Create a New Event</h2>
+          <p>Fill out the details below to add a new event to the platform.</p>
         </div>
-        <div class="form-group">
-          <label for="subtitle" class="form-label">Subtitle</label>
-          <input
-            id="subtitle"
-            name="subtitle"
-            type="text"
-            required
-            class="form-input"
-            placeholder="e.g., Exploring Future Technologies"
-          />
-        </div>
-        <div class="form-group">
-          <label for="description" class="form-label">Description</label>
-          <textarea
-            id="description"
-            name="description"
-            rows="4"
-            required
-            class="form-textarea"
-            placeholder="Provide a detailed description of the event..."
-          ></textarea>
-        </div>
-        <div class="form-grid">
+        <form id="createEventForm" action="#" method="POST">
+          <!-- Form fields remain the same -->
           <div class="form-group">
-            <label for="date" class="form-label">Date</label>
+            <label for="title" class="form-label">Event Title</label>
             <input
-              id="date"
-              name="date"
-              type="date"
+              id="title"
+              name="title"
+              type="text"
               required
               class="form-input"
+              placeholder="e.g., Annual Tech Conference"
             />
           </div>
           <div class="form-group">
-            <label for="mode" class="form-label">Mode</label>
-            <select id="mode" name="mode" required class="form-select">
-              <option value="Offline">Offline</option>
-              <option value="Online">Online</option>
-            </select>
+            <label for="subtitle" class="form-label">Subtitle</label>
+            <input
+              id="subtitle"
+              name="subtitle"
+              type="text"
+              required
+              class="form-input"
+              placeholder="e.g., Exploring Future Technologies"
+            />
           </div>
           <div class="form-group">
-            <label for="eventType" class="form-label">Event Type</label>
-            <select
-              id="eventType"
-              name="eventType"
+            <label for="description" class="form-label">Description</label>
+            <textarea
+              id="description"
+              name="description"
+              rows="4"
               required
-              class="form-select"
-            >
-              <option value="Workshop">Workshop</option>
-              <option value="Seminar">Seminar</option>
-              <option value="Competition">Competition</option>
-              <option value="Cultural">Cultural</option>
-              <option value="Webinar">Webinar</option>
+              class="form-textarea"
+              placeholder="Provide a detailed description of the event..."
+            ></textarea>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="date" class="form-label">Date</label>
+              <input
+                id="date"
+                name="date"
+                type="date"
+                required
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label for="mode" class="form-label">Mode</label>
+              <select id="mode" name="mode" required class="form-select">
+                <option value="Offline">Offline</option>
+                <option value="Online">Online</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="eventType" class="form-label">Event Type</label>
+              <select
+                id="eventType"
+                name="eventType"
+                required
+                class="form-select"
+              >
+                <option value="Workshop">Workshop</option>
+                <option value="Seminar">Seminar</option>
+                <option value="Competition">Competition</option>
+                <option value="Cultural">Cultural</option>
+                <option value="Webinar">Webinar</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="faculty" class="form-label">Faculty / Organizer</label>
+            <select id="faculty" name="faculty" required class="form-select">
+              <option value="Faculty of Engineering">Faculty of Engineering</option>
+              <option value="Faculty of Medicine">Faculty of Medicine</option>
+              <option value="Faculty of Technology">Faculty of Technology</option>
+              <option value="Faculty of Social Science">Faculty of Social Science</option>
+              <option value="Faculty of Management">Faculty of Management</option>
+              <option value="Faculty of Agriculture">Faculty of Agriculture</option>
+              <option value="Faculty of Computing">Faculty of Computing</option>
+              <option value="Student Union">Student Union</option>
+              <option value="IEEE / AIESEC / GDSC clubs">IEEE / AIESEC / GDSC clubs</option>
               <option value="Other">Other</option>
             </select>
           </div>
-        </div>
-        <div class="form-group">
-          <label for="faculty" class="form-label">Faculty / Organizer</label>
-          <select id="faculty" name="faculty" required class="form-select">
-            <option value="Faculty of Engineering">
-              Faculty of Engineering
-            </option>
-            <option value="Faculty of Medicine">Faculty of Medicine</option>
-            <option value="Faculty of Technology">Faculty of Technology</option>
-            <option value="Faculty of Social Science">
-              Faculty of Social Science
-            </option>
-            <option value="Faculty of Management">Faculty of Management</option>
-            <option value="Faculty of Agriculture">
-              Faculty of Agriculture
-            </option>
-            <option value="Faculty of Computing">Faculty of Computing</option>
-            <option value="Student Union">Student Union</option>
-            <option value="IEEE / AIESEC / GDSC clubs">
-              IEEE / AIESEC / GDSC clubs
-            </option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="image" class="form-label">Event Image</label>
-          <input
-            id="image"
-            name="image"
-            type="file"
-            required
-            class="form-input form-file-input"
-            accept="image/png, image/jpeg, image/webp"
-          />
-        </div>
-        <input type="hidden" id="month" name="month" />
-        <input type="hidden" id="day" name="day" />
-
-        <div class="form-actions">
-          <a href="index.html" class="cancel-link">Cancel</a>
-          <button type="submit" class="submit-btn">Create Event</button>
-        </div>
-      </form>
-    </div>
+          <div class="form-group">
+            <label for="image" class="form-label">Event Image</label>
+            <input
+              id="image"
+              name="image"
+              type="file"
+              required
+              class="form-input form-file-input"
+              accept="image/png, image/jpeg, image/webp"
+            />
+          </div>
+          <input type="hidden" id="month" name="month" />
+          <input type="hidden" id="day" name="day" />
+          <div class="form-actions">
+            <a href="index.html" class="cancel-link">Cancel</a>
+            <button type="submit" class="submit-btn">Create Event</button>
+          </div>
+        </form>
+      </div>
+    </main>
 
     <script src="create-event-script.js"></script>
+
+    <!-- Custom Popup -->
+    <div id="customPopup" class="popup-overlay" aria-hidden="true">
+      <div
+        class="popup-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="popupTitle"
+        aria-describedby="popupMessage"
+      >
+        <button class="popup-close" type="button" aria-label="Close">×</button>
+        <h3 id="popupTitle">Message</h3>
+        <p id="popupMessage">This is a responsive popup.</p>
+        <div class="popup-actions">
+          <button class="btn btn-primary" type="button" id="popupOkBtn">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let lastFocusedEl = null;
+
+      function showPopup(title, message, redirectUrl = null) {
+        const overlay = document.getElementById('customPopup');
+        const titleEl = document.getElementById('popupTitle');
+        const msgEl = document.getElementById('popupMessage');
+        const okBtn = document.getElementById('popupOkBtn');
+
+        lastFocusedEl = document.activeElement;
+
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+
+        overlay.style.display = 'flex';
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('body-no-scroll');
+
+        okBtn.focus();
+
+        const close = () => {
+          overlay.style.display = 'none';
+          overlay.setAttribute('aria-hidden', 'true');
+          document.body.classList.remove('body-no-scroll');
+
+          if (lastFocusedEl) lastFocusedEl.focus();
+          if (redirectUrl) window.location.href = redirectUrl;
+
+          overlay.removeEventListener('click', onOutsideClick);
+          document.removeEventListener('keydown', onKeydown);
+        };
+
+        const onOutsideClick = (e) => {
+          if (e.target === overlay) close();
+        };
+
+        const onKeydown = (e) => {
+          if (e.key === 'Escape') close();
+        };
+
+        document.querySelector('.popup-close').onclick = close;
+        okBtn.onclick = close;
+        overlay.addEventListener('click', onOutsideClick);
+        document.addEventListener('keydown', onKeydown);
+      }
+    </script>
+
+    <script src="script.js"></script>
   </body>
 </html>
