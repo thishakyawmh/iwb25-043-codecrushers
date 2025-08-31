@@ -84,7 +84,7 @@ To handle Google Sign-In and Calendar integration, you need to set up a project 
             
         *   **Developer contact information:** Your email address
             
-    *   Add /auth/userinfo.email , /auth/userinfo.profile , openid , /auth/calendar Scopes
+    *   Add the following scopes { /auth/userinfo.email , /auth/userinfo.profile , openid , /auth/calendar }
         
     *   On the "Test users" step, click **"+ Add Users"** and add the Gmail account(s) you will use for testing.
         
