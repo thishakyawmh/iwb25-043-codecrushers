@@ -1,10 +1,7 @@
 import ballerina/http;
-
-//import ballerina/log;
 import ballerina/log;
 import ballerina/uuid;
 import ballerinax/googleapis.gcalendar;
-//import ballerina/uuid;
 import ballerinax/mongodb;
 
 configurable string host = "localhost";
@@ -71,10 +68,6 @@ service on new http:Listener(9091) {
         return from Event e in result
             select e;
     }
-
-    // resource function get movies/[string id]() returns Movie|error {
-    //     return getMovie(self.moviesDb, id);
-    // }
 
     resource function post events(EventInput newEvent) returns string|error {
         string|() creatorEmail;
@@ -148,14 +141,6 @@ service on new http:Listener(9091) {
         return getEvent(self.Univents, id);
     }
 
-    // resource function delete movies/[string id]() returns string|error {
-    //     mongodb:Collection movies = check self.moviesDb->getCollection("movies");
-    //     mongodb:DeleteResult deleteResult = check movies->deleteOne({id});
-    //     if deleteResult.deletedCount != 1 {
-    //         return error(string `Failed to delete the movie ${id}`);
-    //     }
-    //     return id;
-    // }
 }
 
 isolated function getEvent(mongodb:Database Univents, string id) returns Event|error {
