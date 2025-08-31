@@ -1007,4 +1007,48 @@ font-size: 0.85rem;
   line-height: 1.5;
 }
 
-
+.google-login-btn, .google-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #4285F4;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.google-login-btn:hover, .google-logout-btn:hover {
+  background-color: #357ae8;
+}
+.google-login-btn img {
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  padding: 2px;
+}
+.google-logout-btn {
+  background-color: #db4437;
+}
+  .google-logout-btn:hover {
+  background-color: #c23327;
+}
+/* Styles for the modal time details */
+.modal-time-details {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 15px 0;
+  color: #555;
+  font-size: 0.9em;
+}
+.time-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

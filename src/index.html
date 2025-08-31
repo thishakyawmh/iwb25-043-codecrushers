@@ -26,7 +26,9 @@
     <!-- Navigation -->
     <header class="navbar">
       <div class="logo">
-        <a href="index.html"><img src="images/logo.jpg" alt="Univents Logo" /></a>
+        <a href="index.html"
+          ><img src="images/logo.jpg" alt="Univents Logo"
+        /></a>
       </div>
       <nav class="nav-links" id="navLinks">
         <span id="greeting" class="greeting"
@@ -36,6 +38,26 @@
         <a href="create-event.html" class="create-event-btn">
           <i class="fas fa-plus"></i>
           <span>Create Event</span>
+        </a>
+        <a
+          href="http://localhost:9090/login"
+          id="loginBtn"
+          class="google-login-btn"
+        >
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+            alt="Google icon"
+          />
+          <span>Sign in with Google</span>
+        </a>
+        <a
+          href="#"
+          id="logoutBtn"
+          class="google-logout-btn"
+          style="display: none"
+        >
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
         </a>
         <button id="authorize_button" class="google-calandar">
           <img

@@ -5,7 +5,7 @@
 
 [ballerina]
 dependencies-toml-version = "2"
-distribution-version = "2201.12.9"
+distribution-version = "2201.12.7"
 
 [[package]]
 org = "ballerina"
@@ -206,12 +206,15 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "log"
-version = "2.12.0"
+version = "2.13.0"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.value"},
 	{org = "ballerina", name = "observe"}
+]
+modules = [
+	{org = "ballerina", packageName = "log", moduleName = "log"}
 ]
 
 [[package]]
@@ -309,6 +312,22 @@ modules = [
 
 [[package]]
 org = "ballerinax"
+name = "googleapis.gcalendar"
+version = "4.0.1"
+dependencies = [
+	{org = "ballerina", name = "http"},
+	{org = "ballerina", name = "log"},
+	{org = "ballerina", name = "os"},
+	{org = "ballerina", name = "url"},
+	{org = "ballerinai", name = "observe"}
+]
+modules = [
+	{org = "ballerinax", packageName = "googleapis.gcalendar", moduleName = "googleapis.gcalendar"},
+	{org = "ballerinax", packageName = "googleapis.gcalendar", moduleName = "googleapis.gcalendar.mock"}
+]
+
+[[package]]
+org = "ballerinax"
 name = "mongodb"
 version = "5.2.2"
 dependencies = [
@@ -327,8 +346,10 @@ name = "Backend"
 version = "0.1.0"
 dependencies = [
 	{org = "ballerina", name = "http"},
+	{org = "ballerina", name = "log"},
 	{org = "ballerina", name = "uuid"},
 	{org = "ballerinai", name = "observe"},
+	{org = "ballerinax", name = "googleapis.gcalendar"},
 	{org = "ballerinax", name = "mongodb"}
 ]
 modules = [

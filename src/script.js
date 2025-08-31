@@ -26,6 +26,9 @@ const bannerEvent = {
 };
 
 let events;
+//  user name (set here)
+let USER_NAME = 'User';
+let currentModalEvent = null;
 
 async function fetchEvents() {
             // Get references to the HTML elements we'll be working with.
@@ -38,7 +41,7 @@ async function fetchEvents() {
 
             try {
                 // 1. Make the GET request to the Ballerina service using the Fetch API.
-                const response = await fetch(ballerinaServiceUrl);
+                const response = await fetch(ballerinaServiceUrl, {credentials: 'include'});
                 console.log(response);
 
                 // Check if the HTTP response is successful (status codes 200-299).
@@ -63,15 +66,104 @@ async function fetchEvents() {
             }
 }
 
-function initializePage() {
-    // Set banner image
+async function checkAuthStatus() {
+    try {
+        const response = await fetch("http://localhost:9090/auth/status", {
+            method: "GET",
+            credentials: 'include'
+        });
+
+        console.log("Auth status response:", response);
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Auth data:", data);
+            return {
+                isAuthenticated: data.isAuthenticated,
+                userName: data.userName || 'User'
+            };
+        } else {
+            console.log("Auth check failed:", response.status);
+            return {
+                isAuthenticated: false,
+                userName: 'User'
+            };
+        }
+    } catch (error) {
+        console.error("Error checking auth status:", error);
+        return {
+            isAuthenticated: false,
+            userName: 'User'
+        };
+    }
+}
+
+async function initializePage() {
+    // Check for auth success parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('auth') === 'success') {
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        console.log("Authentication successful");
+    }
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    const loginBtn = document.getElementById("loginBtn");
+
+    // Check authentication status
+    const authStatus = await checkAuthStatus();
+    const isLoggedIn = authStatus.isAuthenticated;
+    USER_NAME = authStatus.userName;
+
+    console.log("Auth status:", isLoggedIn, "User:", USER_NAME);
+
+    if (isLoggedIn) {
+        // If the user is logged in, show the Logout button and hide the Sign In button.
+        if(loginBtn) loginBtn.style.display = 'none';
+        if(logoutBtn) logoutBtn.style.display = 'flex';
+    } else {
+        // If the user is not logged in, show the Sign In button and hide the Logout button.
+        if(loginBtn) loginBtn.style.display = 'flex';
+        if(logoutBtn) logoutBtn.style.display = 'none';
+    }
+
+    // Remove the old loadUserInfo function call since we're now doing it above
+    
+    // Updated handleLogout function
+    async function handleLogout() {
+        try {
+            const response = await fetch("http://localhost:9090/logout", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: 'include'
+            });
+
+            console.log("Logout response:", response);
+
+            // Redirect regardless of response
+            setTimeout(() => {
+                window.location.href = "http://localhost:5501/src/index.html";
+            }, 1000);
+
+        } catch (error) {
+            console.error("Error during logout:", error);
+            // Redirect anyway
+            window.location.href = "http://localhost:5501/src/index.html";
+        }
+    }
+
+    // Add logout event listener
+    logoutBtn.addEventListener("click", handleLogout);
+
+    // Rest of your existing initialization code...
     const bannerImg = document.querySelector('.banner img');
     if (bannerImg) {
         bannerImg.src = bannerEvent.image;
         bannerImg.alt = bannerEvent.title;
     }
 
-    // Attach modal opening to banner View More button
     const bannerBtn = document.getElementById('bannerViewMore');
     if(bannerBtn) {
         bannerBtn.addEventListener('click', () => openModal(bannerEvent));
@@ -79,7 +171,7 @@ function initializePage() {
 
     updateGreeting();
     updateCountdown();
-    renderEventCards(); // Initial render
+    renderEventCards();
     initializeFilters();
     setInterval(updateCountdown, 1000);
 }
@@ -87,9 +179,6 @@ function initializePage() {
 
 // Track events added to calendar
 const addedEvents = new Set();
-
-//  user name (set here)
-let USER_NAME = 'Thishkya';
 
 function updateGreeting() {
   const now = new Date();
@@ -146,6 +235,7 @@ function updateCountdown() {
 
 // Modal functionality
 function openModal(event) {
+  
   const modal = document.getElementById('eventModal');
   const modalTitle = document.getElementById('modalEventTitle');
   const modalImage = document.getElementById('modalEventImage');
@@ -153,6 +243,8 @@ function openModal(event) {
   const modalEventType = document.getElementById('modalEventType');
   const modalMode = document.getElementById('modalMode');
   const modalDescription = document.getElementById('modalDescription');
+
+  currentModalEvent = event;
 
   // Populate modal with event data
   modalTitle.textContent = event.title;
@@ -177,7 +269,43 @@ function closeModal() {
   document.body.style.overflow = 'auto'; // Restore scrolling
 }
 
-function addToCalendar() {
+async function addToCalendar() {
+    console.log(currentModalEvent);
+
+    const payload = {
+        summary: currentModalEvent.title,
+        description: currentModalEvent.description,
+        startDateTime: new Date(currentModalEvent.startTime).toISOString(),
+        endDateTime: new Date(currentModalEvent.endTime).toISOString()
+    };
+
+    try {
+        const response = await fetch("http://localhost:9090/events", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            alert("Event added to your Google Calendar successfully!");
+            addedEvents.add(currentModalEvent.title);
+            // Visually update buttons
+            const modalBtn = document.querySelector('#eventModal .add-to-calendar-btn');
+            const cardBtn = document.querySelector(`.card-calendar-btn[data-title="${currentModalEvent.title}"]`);
+            syncButtonState(modalBtn, true);
+            if(cardBtn) syncButtonState(cardBtn, true);
+        } else {
+             const errorData = await response.json();
+             alert(`Failed to add event: ${errorData.body || 'Please make sure you are logged in.'}`);
+        }
+    } catch (error) {
+        console.error("Error adding event to calendar:", error);
+        alert("An error occurred. Could not add event to calendar.");
+    }
+
     const modalBtn = document.querySelector('#eventModal .add-to-calendar-btn');
     const eventTitle = document.getElementById('modalEventTitle').textContent;
     const isCurrentlyAdded = addedEvents.has(eventTitle);
@@ -371,11 +499,6 @@ function addToCalendar() {
               </div>
             </div>
           </div>
-          <div class="event-actions">
-            <button class="card-calendar-btn ${addedEvents.has(e.title) ? 'removed' : ''}" data-title="${e.title}" onclick="event.stopPropagation(); toggleCalendar(this, '${e.title}')">
-              ${addedEvents.has(e.title) ? '<i class="fas fa-minus"></i> Remove from Calendar' : '<i class="fas fa-plus"></i> Add to Calendar'}
-            </button>
-          </div>
         </div>
       `;
     }).join("");
@@ -394,41 +517,4 @@ function addToCalendar() {
   bannerBtn.addEventListener('click', function(){
     openModal(bannerEvent);
   });
-// Google Calendar API
 
-
-// const CLIENT_ID = 'Add the client ID here'; // Replace with your actual OAuth2 client ID
-// const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
-
-
-// function authenticate() {
-//   return gapi.auth2.getAuthInstance()
-//     .signIn({ scope: SCOPES })
-//     .then(() => {
-//       console.log("✅ Sign-in successful");
-//       return gapi.client.request({
-//         'path': 'https://www.googleapis.com/oauth2/v3/userinfo'
-//       });
-//     })
-//     .then(response => {
-//       USER_NAME = response.result.name || response.result.email;
-//       console.log("👤 USER_NAME =", USER_NAME);
-
-//       // Optional: now open Google Calendar
-//       window.open("https://calendar.google.com", "_blank");
-//     })
-//     .catch(err => {
-//       console.error("❌ Error during authentication or user info fetch", err);
-//     });
-// }
-
-// function initClient() {
-//   gapi.client.init({
-//     clientId: CLIENT_ID,
-//     scope: SCOPES
-//   });
-// }
-
-// gapi.load('client:auth2', initClient);
-
-// document.getElementById("authorize_button").addEventListener("click", authenticate);

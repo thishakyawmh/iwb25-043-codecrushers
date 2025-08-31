@@ -33,6 +33,8 @@ document.getElementById('createEventForm').addEventListener('submit', function(e
             faculty: document.getElementById('faculty').value,
             mode: document.getElementById('mode').value,
             date: document.getElementById('date').value,
+            startTime: document.getElementById('startTime').value,
+            endTime: document.getElementById('endTime').value,
             description: document.getElementById('description').value
         };
 
