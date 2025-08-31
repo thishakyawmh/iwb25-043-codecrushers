@@ -650,7 +650,15 @@ font-size: 0.85rem;
 
 .modal-actions {
   padding: 0 2rem 2rem 2rem;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px; /* Adjust gap as needed */
+}
+
+.modal-actions button {
+  font-size: 14px;
+  border-radius: 10px; /* optional if you want a rounded look */
 }
 
 .add-to-calendar-btn {
@@ -968,7 +976,12 @@ font-size: 0.85rem;
     padding: 1rem 1rem 0.5rem 1rem;
   }
   .modal-actions {
-    padding: 0 1rem 1rem 1rem;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .modal-actions button {
+    flex: 1 1 auto;
+    font-size: 13px;
   }
   .add-to-calendar-btn {
     padding: 0.7rem 1.2rem;
@@ -1083,8 +1096,28 @@ color: white;
 }
 
 .delete-event-btn {
-background-color: #dc3545;
-color: white;
+  background: #dc3545; 
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem 2.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(40,167,69,0.3);
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0 auto;
+}
+
+.delete-event-btn:hover {
+  background: #a81524; /* Darker green on hover */
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(40,167,69,0.4);
 }
 
 .popup-overlay {

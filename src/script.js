@@ -412,47 +412,52 @@ function closeModal() {
 }
 
 async function deleteEvent() {
-    if (!currentModalEvent || !isEventCreator(currentModalEvent)) {
-        alert('You can only delete events you created.');
-        return;
-    }
+  if (!currentModalEvent || !isEventCreator(currentModalEvent)) {
+    showPopup("Error", "You can only delete events you created.");
+    return;
+  }
 
-    const confirmDelete = confirm(`Are you sure you want to delete "${currentModalEvent.title}"? This action cannot be undone.`);
-    
-    if (!confirmDelete) {
-        return;
-    }
+  const confirmDelete = await showConfirmPopup(
+    "Confirm Deletion",
+    `Are you sure you want to delete "${currentModalEvent.title}"? This action cannot be undone.`
+  );
 
-    try {
-        const response = await fetch(`http://localhost:9091/events/${currentModalEvent.id}`, {
-            method: "DELETE",
-            credentials: 'include'
-        });
+  if (!confirmDelete) {
+    return;
+  }
 
-        if (response.ok) {
-            alert("Event deleted successfully!");
-            
-            // Remove from local events array
-            events = events.filter(e => e.id !== currentModalEvent.id);
-            
-            // Close modal
-            closeModal();
-            
-            // Re-render events
-            findNextUpcomingEvent();
-            updateBanner();
-            renderEventCards();
-            
-            console.log(`Event "${currentModalEvent.title}" deleted successfully`);
-            
-        } else {
-            const errorData = await response.json();
-            alert(`Failed to delete event: ${errorData.body || 'Permission denied.'}`);
-        }
-    } catch (error) {
-        console.error("Error deleting event:", error);
-        alert("An error occurred while deleting the event.");
+  try {
+    const response = await fetch(`http://localhost:9091/events/${currentModalEvent.id}`, {
+      method: "DELETE",
+      credentials: 'include'
+    });
+
+    if (response.ok) {
+      // Remove from local events array first
+      events = events.filter(e => e.id !== currentModalEvent.id);
+      
+      // Close modal immediately before showing popup
+      closeModal();
+      
+      // Update UI
+      findNextUpcomingEvent();
+      updateBanner();
+      renderEventCards();
+      
+      // Show success popup after a small delay to ensure modal is closed
+      setTimeout(() => {
+        showPopup("Success", "Event deleted successfully!");
+      }, 100);
+      
+      console.log(`Event "${currentModalEvent.title}" deleted successfully`);
+    } else {
+      const errorData = await response.json();
+      showPopup("Error", `Failed to delete event: ${errorData.body || 'Permission denied.'}`);
     }
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    showPopup("Error", "An error occurred while deleting the event.");
+  }
 }
 
 function showPopup(title, message, redirectUrl = null) {
@@ -463,23 +468,21 @@ function showPopup(title, message, redirectUrl = null) {
     return;
   }
 
-  // Create the popup box if it doesn't exist
-  if (!overlay.querySelector('.popup-box')) {
-    overlay.innerHTML = `
-      <div class="popup-box" role="dialog" aria-modal="true">
-        <button class="popup-close" type="button" aria-label="Close">×</button>
-        <h3 id="popupTitle">${title}</h3>
-        <p id="popupMessage">${message}</p>
-        <div class="popup-actions">
-          <button class="btn btn-primary" type="button" id="popupOkBtn">OK</button>
-        </div>
+  // Clear any existing popup content and event listeners
+  overlay.innerHTML = '';
+  overlay.style.display = 'none';
+  
+  // Create fresh popup content
+  overlay.innerHTML = `
+    <div class="popup-box" role="dialog" aria-modal="true">
+      <button class="popup-close" type="button" aria-label="Close">×</button>
+      <h3 id="popupTitle">${title}</h3>
+      <p id="popupMessage">${message}</p>
+      <div class="popup-actions">
+        <button class="btn btn-primary" type="button" id="popupOkBtn">OK</button>
       </div>
-    `;
-  } else {
-    // Update existing popup content
-    overlay.querySelector('#popupTitle').textContent = title;
-    overlay.querySelector('#popupMessage').textContent = message;
-  }
+    </div>
+  `;
 
   // Make sure the overlay is visible
   overlay.style.display = 'flex';
@@ -488,24 +491,102 @@ function showPopup(title, message, redirectUrl = null) {
   // Define the close function
   const closePopup = () => {
     overlay.style.display = 'none';
+    overlay.innerHTML = ''; // Clear content
     if (redirectUrl) window.location.href = redirectUrl;
     console.log("Popup closed"); // Debug log
   };
 
-  // Attach one-time listeners to close buttons
+  // Attach event listeners with immediate cleanup
   const closeBtn = overlay.querySelector('.popup-close');
   const okBtn = overlay.querySelector('#popupOkBtn');
 
-  closeBtn.addEventListener('click', closePopup, { once: true });
-  okBtn.addEventListener('click', closePopup, { once: true });
+  const handleClose = (e) => {
+    e.stopPropagation();
+    closePopup();
+  };
+
+  closeBtn.addEventListener('click', handleClose);
+  okBtn.addEventListener('click', handleClose);
 
   // Close popup if clicking outside the popup box
-  overlay.addEventListener('click', function handler(e) {
+  const handleOverlayClick = (e) => {
     if (e.target === overlay) {
       closePopup();
-      overlay.removeEventListener('click', handler);
     }
-  }, { once: true });
+  };
+  
+  overlay.addEventListener('click', handleOverlayClick);
+}
+
+function showConfirmPopup(title, message) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById('customPopup');
+    if (!overlay) {
+      console.error("Popup container not found!");
+      resolve(false);
+      return;
+    }
+
+    // Create confirmation popup markup with two buttons
+    overlay.innerHTML = `
+      <div class="popup-box" role="dialog" aria-modal="true">
+        <button class="popup-close" type="button" aria-label="Close">×</button>
+        <h3 id="popupTitle">${title}</h3>
+        <p id="popupMessage">${message}</p>
+        <div class="popup-actions">
+          <button class="btn btn-secondary" id="popupCancelBtn">Cancel</button>
+          <button class="btn btn-primary" id="popupConfirmBtn">Delete</button>
+        </div>
+      </div>
+    `;
+    overlay.style.display = 'flex';
+    overlay.style.zIndex = '99999';
+
+    const closePopup = () => {
+      overlay.style.display = 'none';
+    };
+
+    // Cleanup event listeners function
+    const cleanup = () => {
+      closeBtn.removeEventListener('click', onCancel);
+      cancelBtn.removeEventListener('click', onCancel);
+      confirmBtn.removeEventListener('click', onConfirm);
+    };
+
+    const closeBtn = overlay.querySelector('.popup-close');
+    const cancelBtn = overlay.querySelector('#popupCancelBtn');
+    const confirmBtn = overlay.querySelector('#popupConfirmBtn');
+
+    const onCancel = () => {
+      cleanup();
+      closePopup();
+      resolve(false);
+    };
+
+    const onConfirm = () => {
+      cleanup();
+      closePopup();
+      resolve(true);
+    };
+
+    closeBtn.addEventListener('click', onCancel, { once: true });
+    cancelBtn.addEventListener('click', onCancel, { once: true });
+    confirmBtn.addEventListener('click', onConfirm, { once: true });
+
+    // Also close popup if clicking outside the popup box
+    overlay.addEventListener(
+      'click',
+      function handler(e) {
+        if (e.target === overlay) {
+          cleanup();
+          closePopup();
+          resolve(false);
+          overlay.removeEventListener('click', handler);
+        }
+      },
+      { once: true }
+    );
+  });
 }
 
 async function addToCalendar() {
