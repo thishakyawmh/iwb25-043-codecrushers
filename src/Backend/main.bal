@@ -27,6 +27,25 @@ final mongodb:Client mongoDb = check new ({
     }
 });
 
+final string[] & readonly ADMIN_EMAILS = [
+    "savindumarapana@gmail.com",
+    "hirunthishakya.wmh25@gmail.com",
+    "tharushatheekshana25@gmail.com"
+];
+
+isolated function isAdmin(string? userEmail) returns boolean {
+    if userEmail is () {
+        return false;
+    }
+
+    foreach string adminEmail in ADMIN_EMAILS {
+        if adminEmail.equalsIgnoreCaseAscii(userEmail) {
+            return true;
+        }
+    }
+    return false;
+}
+
 @http:ServiceConfig {
     cors: {
         allowOrigins: ["*"],
@@ -57,10 +76,65 @@ service on new http:Listener(9091) {
     // }
 
     resource function post events(EventInput newEvent) returns string|error {
+        string|() creatorEmail;
+        string|() creatorName;
+
+        lock {
+            creatorEmail = currentUserMail;
+            creatorName = currentUserName;
+        }
+
+        // Check if user is authenticated and is admin
+        if creatorEmail is () || !isAdmin(creatorEmail) {
+            return error("Unauthorized: Only admins can create events");
+        }
+
         string id = uuid:createType1AsString();
-        Event event = {id, ...newEvent};
+        Event event = {id, ...newEvent, createdBy: creatorEmail, createdByName: creatorName ?: "Unknown Admin"};
+
         mongodb:Collection events = check self.Univents->getCollection("Events");
         check events->insertOne(event);
+
+        log:printInfo("Event created by admin",
+                eventId = id,
+                createdBy = creatorEmail,
+                eventTitle = newEvent.title);
+
+        return id;
+    }
+
+    resource function delete events/[string id]() returns string|http:Unauthorized|error {
+        string|() currentUserEmail;
+
+        lock {
+            currentUserEmail = currentUserMail;
+        }
+
+        if currentUserEmail is () {
+            return <http:Unauthorized>{body: "User not authenticated"};
+        }
+
+        // Get the event to check creator
+        Event existingEvent = check getEvent(self.Univents, id);
+
+        // Check if current user is the creator of this event
+        if existingEvent.createdBy != currentUserEmail {
+            return <http:Unauthorized>{
+                body: "Access denied: You can only delete events you created"
+            };
+        }
+
+        mongodb:Collection events = check self.Univents->getCollection("Events");
+        mongodb:DeleteResult deleteResult = check events->deleteOne({id});
+
+        if deleteResult.deletedCount != 1 {
+            return error(string `Failed to delete the event ${id}`);
+        }
+
+        log:printInfo("Event deleted by creator",
+                eventId = id,
+                deletedBy = currentUserEmail);
+
         return id;
     }
 
@@ -89,28 +163,9 @@ isolated function getEvent(mongodb:Database Univents, string id) returns Event|e
     Event[] result = check from Event e in findResult
         select e;
     if result.length() != 1 {
-        return error(string `Failed to find a movie with id ${id}`);
+        return error(string `Failed to find a event with id ${id}`);
     }
     return result[0];
-}
-
-final string[] & readonly ADMIN_EMAILS = [
-    "savindumarapana@gmail.com",
-    "hirunthishakya.wmh25@gmail.com",
-    "tharushatheekshana25@gmail.com"
-];
-
-isolated function isAdmin(string? userEmail) returns boolean {
-    if userEmail is () {
-        return false;
-    }
-
-    foreach string adminEmail in ADMIN_EMAILS {
-        if adminEmail.equalsIgnoreCaseAscii(userEmail) {
-            return true;
-        }
-    }
-    return false;
 }
 
 @http:ServiceConfig {

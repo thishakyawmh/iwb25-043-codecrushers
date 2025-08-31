@@ -20,6 +20,10 @@ let USER_MAIL = 'user@gmail.com';
 let IS_ADMIN = false;
 let currentModalEvent = null;
 
+function isEventCreator(event) {
+    return event.createdBy && event.createdBy === USER_MAIL;
+}
+
 async function fetchEvents() {
             // Get references to the HTML elements we'll be working with.
             const eventsList = document.getElementById('events-list');
@@ -385,14 +389,16 @@ function openModal(event) {
   syncButtonState(modalBtn, addedEvents.has(event.title));
 
   // Show admin-only modal buttons if user is admin
-  const editEventBtn = modal.querySelector('.edit-event-btn');
-  const deleteEventBtn = modal.querySelector('.delete-event-btn');
-  
-  if (editEventBtn) {
-      editEventBtn.style.display = IS_ADMIN ? 'inline-block' : 'none';
-  }
+  const deleteEventBtn = document.getElementById('deleteEventBtn');
   if (deleteEventBtn) {
-      deleteEventBtn.style.display = IS_ADMIN ? 'inline-block' : 'none';
+      const canDelete = isEventCreator(event);
+      deleteEventBtn.style.display = canDelete ? 'inline-block' : 'none';
+      
+      if (canDelete) {
+          console.log(`Delete button shown for event "${event.title}" - created by current user`);
+      } else {
+          console.log(`Delete button hidden for event "${event.title}" - not created by current user`);
+      }
   }
 
   modal.style.display = 'block';
@@ -403,6 +409,50 @@ function closeModal() {
   const modal = document.getElementById('eventModal');
   modal.style.display = 'none';
   document.body.style.overflow = 'auto'; // Restore scrolling
+}
+
+async function deleteEvent() {
+    if (!currentModalEvent || !isEventCreator(currentModalEvent)) {
+        alert('You can only delete events you created.');
+        return;
+    }
+
+    const confirmDelete = confirm(`Are you sure you want to delete "${currentModalEvent.title}"? This action cannot be undone.`);
+    
+    if (!confirmDelete) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:9091/events/${currentModalEvent.id}`, {
+            method: "DELETE",
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            alert("Event deleted successfully!");
+            
+            // Remove from local events array
+            events = events.filter(e => e.id !== currentModalEvent.id);
+            
+            // Close modal
+            closeModal();
+            
+            // Re-render events
+            findNextUpcomingEvent();
+            updateBanner();
+            renderEventCards();
+            
+            console.log(`Event "${currentModalEvent.title}" deleted successfully`);
+            
+        } else {
+            const errorData = await response.json();
+            alert(`Failed to delete event: ${errorData.body || 'Permission denied.'}`);
+        }
+    } catch (error) {
+        console.error("Error deleting event:", error);
+        alert("An error occurred while deleting the event.");
+    }
 }
 
 function showPopup(title, message, redirectUrl = null) {
@@ -667,11 +717,20 @@ async function addToCalendar() {
       // Add class for past events
       const cardClass = diffDays < 0 ? 'event-card past-event' : 'event-card';
 
+      const showDeleteButton = isEventCreator(e);
+      
+      // Add delete button to event card if user is the creator
+      const deleteButtonHtml = showDeleteButton ? 
+          `<button class="card-delete-btn" onclick="event.stopPropagation(); deleteEventFromCard('${e.id}')" title="Delete Event">
+              <i class="fas fa-trash"></i>
+          </button>` : '';
+
       return `
         <div class="${cardClass}" onclick="openModal(${JSON.stringify(e).replace(/"/g, '&quot;')})">
           <div class="event-image">
             <img src="${e.image}" alt="${e.title}" />
             <div class="price">${remainingText}</div>
+             ${deleteButtonHtml}
           </div>
           <div class="event-info">
             <div class="event-date">
@@ -685,6 +744,7 @@ async function addToCalendar() {
                 <span class="tag event-type">${e.eventType}</span>
                 <span class="separator">|</span>
                 <span class="tag mode">${e.mode}</span>
+                ${showDeleteButton ? `<span class="creator-badge" title="You created this event"><i class="fas fa-crown"></i></span>` : ''}
               </div>
             </div>
           </div>
@@ -692,6 +752,49 @@ async function addToCalendar() {
       `;
     }).join("");
   }
+
+  async function deleteEventFromCard(eventId) {
+    const eventToDelete = events.find(e => e.id === eventId);
+    
+    if (!eventToDelete || !isEventCreator(eventToDelete)) {
+        alert('You can only delete events you created.');
+        return;
+    }
+
+    const confirmDelete = confirm(`Are you sure you want to delete "${eventToDelete.title}"? This action cannot be undone.`);
+    
+    if (!confirmDelete) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:9091/events/${eventId}`, {
+            method: "DELETE",
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            alert("Event deleted successfully!");
+            
+            // Remove from local events array
+            events = events.filter(e => e.id !== eventId);
+            
+            // Re-render everything
+            findNextUpcomingEvent();
+            updateBanner();
+            renderEventCards();
+            
+            console.log(`Event "${eventToDelete.title}" deleted successfully`);
+            
+        } else {
+            const errorData = await response.json();
+            alert(`Failed to delete event: ${errorData.body || 'Permission denied.'}`);
+        }
+    } catch (error) {
+        console.error("Error deleting event:", error);
+        alert("An error occurred while deleting the event.");
+    }
+}
 
   // Add event listeners for filters
   function initializeFilters() {

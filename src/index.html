@@ -50,7 +50,9 @@
           id="loginBtn"
           class="google-login-btn"
         >
-          <span><i class="fa-brands fa-google"></i>&nbsp; Sign in with Google</span>
+          <span
+            ><i class="fa-brands fa-google"></i>&nbsp; Sign in with Google</span
+          >
         </a>
         <a
           href="#"
@@ -187,6 +189,14 @@
         <div class="modal-actions">
           <button class="add-to-calendar-btn" onclick="addToCalendar()">
             <i class="fas fa-plus"></i> Add to Calendar
+          </button>
+          <button
+            id="deleteEventBtn"
+            class="delete-event-btn"
+            onclick="deleteEvent()"
+            style="display: none"
+          >
+            <i class="fas fa-trash"></i> Delete Event
           </button>
         </div>
       </div>

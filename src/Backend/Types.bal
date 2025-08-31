@@ -11,7 +11,6 @@ public type EventInput record {|
     string startTime;
     string endTime;
     string description;
-
 |};
 
 public type EventUpdate record {|
@@ -27,11 +26,15 @@ public type EventUpdate record {|
     string startTime?;
     string endTime?;
     string description?;
+    string createdBy?;
+    string createdByName?;
 |};
 
 public type Event record {|
     readonly string id;
     *EventInput;
+    string createdBy?;
+    string createdByName?;
 |};
 
 type EventPayload record {|
