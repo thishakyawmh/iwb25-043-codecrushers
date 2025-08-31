@@ -1,7 +1,7 @@
 Univents - Campus Event Management Platform
 ===========================================
 
-Welcome to Univents, a dynamic and decentralized event management platform designed for university campuses. This application empowers student organizations, clubs, and faculties to publish and manage their own events, creating a single, unified calendar for the entire student community. The backend is powered by Ballerina, showcasing its strengths in integration and API development.
+Welcome to Univents, a dynamic and centralized event management platform designed for university campuses. This application empowers student organizations, clubs, and faculties to publish and manage their own events, creating a single, unified calendar for the entire student community. The backend is powered by Ballerina, showcasing its strengths in integration and API development.
 
 
 Key Features
