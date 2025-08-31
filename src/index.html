@@ -74,9 +74,30 @@
     <section class="banner-section">
       <div class="banner">
         <img src="" alt="Event Banner" />
+        <!-- Event Info Overlay -->
+        <div class="banner-content-overlay">
+          <div class="banner-event-info">
+            <div class="banner-event-tags">
+              <span class="banner-tag event-type" id="bannerEventType"
+                >Workshop</span
+              >
+              <span class="banner-separator">|</span>
+              <span class="banner-tag faculty" id="bannerFaculty"
+                >Faculty Name</span
+              >
+              <span class="banner-separator">|</span>
+              <span class="banner-tag mode" id="bannerMode">Online</span>
+            </div>
+            <h1 class="banner-title" id="bannerTitle">Next Upcoming Event</h1>
+            <p class="banner-subtitle" id="bannerSubtitle">
+              Event description will appear here
+            </p>
+          </div>
+        </div>
+
         <!-- Countdown and Button Overlay -->
         <div class="banner-overlay-container">
-          <div class="countdown-header">STARTS ON</div>
+          <div class="countdown-header">STARTS IN</div>
           <div id="event-countdown" class="countdown"></div>
           <button id="bannerViewMore" class="view-more-btn">View more</button>
         </div>
@@ -124,7 +145,7 @@
             <option value="all" disabled selected>Mode</option>
             <option value="all">All</option>
             <option value="online">Online</option>
-            <option value="offline">Offline</option>
+            <option value="physical">Physical</option>
           </select>
           <!-- Calendar filter -->
           <select id="calendarFilter" title="Calendar">

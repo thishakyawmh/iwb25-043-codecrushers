@@ -11,19 +11,7 @@ window.addEventListener("load", () => {
     }, 2000); 
 });
 
-// Featured banner event data (used for the banner "View more" button)
-const bannerEvent = {
-  image: 'images/banners/banner.jpg',
-  month: 'AUG',
-  day: '25',
-  title: 'Featured Orientation Program',
-  subtitle: 'Welcome to New Students',
-  eventType: 'Seminar',
-  faculty: 'Student Union',
-  mode: 'Offline',
-  date: '2025-10-02',
-  description: 'Join us for the grand orientation program where you will get to know the university, faculty heads, and participate in fun activities to kick-start your journey.'
-};
+let nextUpcomingEvent = null;
 
 let events;
 //  user name (set here)
@@ -54,6 +42,7 @@ async function fetchEvents() {
                 events = await response.json();
                 console.log(events);
 
+                findNextUpcomingEvent();
                 initializePage();
 
               }catch (error) {
@@ -64,6 +53,41 @@ async function fetchEvents() {
                 loadingMessage.style.display = 'none'; // Hide loading message
                 eventsList.innerHTML = `<p class="text-center text-red-500">Error loading events. Please check the console for details.</p>`;
             }
+}
+
+function findNextUpcomingEvent() {
+    const now = new Date();
+    
+    // Filter future events and sort by date
+    const upcomingEvents = events
+        .filter(event => {
+            const eventDate = new Date(event.date || event.startTime);
+            return eventDate > now;
+        })
+        .sort((a, b) => {
+            const dateA = new Date(a.date || a.startTime);
+            const dateB = new Date(b.date || b.startTime);
+            return dateA - dateB;
+        });
+    
+    // Get the next upcoming event or fallback to a default
+    if (upcomingEvents.length > 0) {
+        nextUpcomingEvent = upcomingEvents[0];
+    } else {
+        // Fallback if no upcoming events
+        nextUpcomingEvent = {
+            image: 'images/banners/banner.jpg',
+            month: 'NO',
+            day: 'EVENTS',
+            title: 'No Upcoming Events',
+            subtitle: 'Check back later',
+            eventType: 'N/A',
+            faculty: 'N/A',
+            mode: 'N/A',
+            date: new Date().toISOString(),
+            description: 'There are currently no upcoming events. Please check back later for new events.'
+        };
+    }
 }
 
 async function checkAuthStatus() {
@@ -157,12 +181,14 @@ async function initializePage() {
     // Add logout event listener
     logoutBtn.addEventListener("click", handleLogout);
 
+    updateBanner();
+
     // Rest of your existing initialization code...
-    const bannerImg = document.querySelector('.banner img');
-    if (bannerImg) {
-        bannerImg.src = bannerEvent.image;
-        bannerImg.alt = bannerEvent.title;
-    }
+    // const bannerImg = document.querySelector('.banner img');
+    // if (bannerImg) {
+    //     bannerImg.src = bannerEvent.image;
+    //     bannerImg.alt = bannerEvent.title;
+    // }
 
     const bannerBtn = document.getElementById('bannerViewMore');
     if(bannerBtn) {
@@ -175,6 +201,31 @@ async function initializePage() {
     initializeFilters();
     setInterval(updateCountdown, 1000);
 }
+
+function updateBanner() {
+    if (!nextUpcomingEvent) return;
+    
+    // Update banner image
+    const bannerImg = document.querySelector('.banner img');
+    if (bannerImg) {
+        bannerImg.src = nextUpcomingEvent.image;
+        bannerImg.alt = nextUpcomingEvent.title;
+    }
+    
+    // Update banner text elements if they exist in your HTML
+    const bannerTitle = document.querySelector('.banner .title');
+    const bannerSubtitle = document.querySelector('.banner .subtitle');
+    const bannerEventType = document.querySelector('.banner .event-type');
+    const bannerFaculty = document.querySelector('.banner .faculty');
+    const bannerMode = document.querySelector('.banner .mode');
+    
+    if (bannerTitle) bannerTitle.textContent = nextUpcomingEvent.title;
+    if (bannerSubtitle) bannerSubtitle.textContent = nextUpcomingEvent.subtitle || nextUpcomingEvent.description;
+    if (bannerEventType) bannerEventType.textContent = nextUpcomingEvent.eventType;
+    if (bannerFaculty) bannerFaculty.textContent = nextUpcomingEvent.faculty;
+    if (bannerMode) bannerMode.textContent = nextUpcomingEvent.mode;
+}
+
 
 
 // Track events added to calendar
@@ -198,10 +249,14 @@ function updateGreeting() {
 }
 
 function updateCountdown() {
-  const target = new Date(bannerEvent.date);
+  if (!nextUpcomingEvent) return;
+  
+  const target = new Date(nextUpcomingEvent.date || nextUpcomingEvent.startTime);
   const now = new Date();
   const diff = target - now;
   const el = document.getElementById("event-countdown");
+
+  if (!el) return; // Exit if element doesn't exist
 
   if (diff <= 0) {
     el.innerHTML = `<div class="countdown-block"><span class="countdown-label">Event</span><span class="countdown-value">Started</span></div>`;
@@ -431,7 +486,7 @@ async function addToCalendar() {
       if (modeFilter !== 'all' && modeFilter !== '') {
         const modeMapping = {
           'online': 'Online',
-          'offline': 'Offline'
+          'physical': 'Physical'
         };
         if (modeMapping[modeFilter] !== event.mode) return false;
       }
@@ -513,8 +568,11 @@ async function addToCalendar() {
   }
 
   // Attach modal opening to banner View More button
-  const bannerBtn = document.getElementById('bannerViewMore');
-  bannerBtn.addEventListener('click', function(){
-    openModal(bannerEvent);
+ const bannerBtn = document.getElementById('bannerViewMore');
+  if (bannerBtn) {
+    bannerBtn.addEventListener('click', function(){
+      if (nextUpcomingEvent) {
+        openModal(nextUpcomingEvent);
+      }
   });
-
+}
