@@ -1052,3 +1052,33 @@ font-size: 0.85rem;
   align-items: center;
   gap: 8px;
 }
+
+.admin-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.edit-event-btn, .delete-event-btn {
+margin-left: 10px;
+padding: 8px 16px;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+}
+
+.edit-event-btn {
+background-color: #ffc107;
+color: white;
+}
+
+.delete-event-btn {
+background-color: #dc3545;
+color: white;
+}

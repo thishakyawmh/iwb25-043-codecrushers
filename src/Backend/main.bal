@@ -16,6 +16,7 @@ configurable string redirectUrl = "http://localhost:9090/oauth2/callback";
 
 gcalendar:Client? calendarClient = ();
 string? currentUserName = ();
+string? currentUserMail = ();
 
 final mongodb:Client mongoDb = check new ({
     connection: {
@@ -93,6 +94,25 @@ isolated function getEvent(mongodb:Database Univents, string id) returns Event|e
     return result[0];
 }
 
+final string[] & readonly ADMIN_EMAILS = [
+    "savindumarapana@gmail.com",
+    "hirunthishakya.wmh25@gmail.com",
+    "tharushatheekshana25@gmail.com"
+];
+
+isolated function isAdmin(string? userEmail) returns boolean {
+    if userEmail is () {
+        return false;
+    }
+
+    foreach string adminEmail in ADMIN_EMAILS {
+        if adminEmail.equalsIgnoreCaseAscii(userEmail) {
+            return true;
+        }
+    }
+    return false;
+}
+
 @http:ServiceConfig {
     cors: {
         allowOrigins: ["*"],
@@ -107,15 +127,26 @@ service / on new http:Listener(9090) {
 
     resource function get user() returns http:Ok|http:Unauthorized {
         string|() userName;
+        string|() userMail;
+
         lock {
             userName = currentUserName;
+            userMail = currentUserMail;
         }
 
         if userName is () {
             return <http:Unauthorized>{body: "User not authenticated or user info not available."};
         }
 
-        return <http:Ok>{body: {"userName": userName}};
+        boolean adminStatus = isAdmin(userMail);
+
+        return <http:Ok>{
+            body: {
+                "userName": userName,
+                "userMail": userMail ?: "Email not available",
+                "isAdmin": adminStatus
+            }
+        };
     }
 
     resource function post logout() returns http:Ok {
@@ -142,7 +173,7 @@ service / on new http:Listener(9090) {
 
     resource function get login() returns http:TemporaryRedirect {
         string authorizationEndpoint = "https://accounts.google.com/o/oauth2/v2/auth";
-        string scope = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.profile";
+        string scope = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
         string authUrl = authorizationEndpoint +
             string `?response_type=code&client_id=${clientId}&redirect_uri=${redirectUrl}&scope=${scope}&access_type=offline`;
 
@@ -153,20 +184,26 @@ service / on new http:Listener(9090) {
 
     resource function get auth/status() returns http:Ok|http:Unauthorized {
         string|() userName;
+        string|() userMail;
         gcalendar:Client|() calendarClientLocal; // Renamed to avoid conflict with 'client' keyword
 
         lock {
             userName = currentUserName;
+            userMail = currentUserMail;
             calendarClientLocal = calendarClient;
         }
 
-        log:printInfo("Auth status check", userName = userName, hasClient = (calendarClientLocal is gcalendar:Client));
+        boolean adminStatus = isAdmin(userMail);
+
+        log:printInfo("Auth status check", userName = userName, userMail = userMail, isAdmin = adminStatus, hasClient = (calendarClientLocal is gcalendar:Client));
 
         if userName is string && calendarClientLocal is gcalendar:Client {
             return <http:Ok>{
                 body: {
                     "isAuthenticated": true,
-                    "userName": userName
+                    "userName": userName,
+                    "userMail": userMail ?: "Email not available",
+                    "isAdmin": adminStatus
                 }
             };
         } else {
@@ -214,11 +251,20 @@ service / on new http:Listener(9090) {
 
                     if userInfoPayload is json {
                         json|error userName = userInfoPayload.name;
+                        json|error userEmail = userInfoPayload.email;
+
                         if userName is string {
                             lock {
                                 currentUserName = userName;
                             }
                             log:printInfo("Retrieved user information", userName = userName);
+                        }
+
+                        if userEmail is string {
+                            lock {
+                                currentUserMail = userEmail;
+                            }
+                            log:printInfo("Retrieved user email", userEmail = userEmail);
                         }
                     }
 

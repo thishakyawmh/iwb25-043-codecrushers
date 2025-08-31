@@ -16,6 +16,8 @@ let nextUpcomingEvent = null;
 let events;
 //  user name (set here)
 let USER_NAME = 'User';
+let USER_MAIL = 'user@gmail.com';
+let IS_ADMIN = false;
 let currentModalEvent = null;
 
 async function fetchEvents() {
@@ -104,23 +106,68 @@ async function checkAuthStatus() {
             console.log("Auth data:", data);
             return {
                 isAuthenticated: data.isAuthenticated,
-                userName: data.userName || 'User'
+                userName: data.userName || 'User',
+                userMail: data.userMail || 'User@gmail.com',
+                isAdmin: data.isAdmin || false
             };
         } else {
             console.log("Auth check failed:", response.status);
             return {
                 isAuthenticated: false,
-                userName: 'User'
+                userName: 'User',
+                userMail: 'User@gmail.com',
+                isAdmin: false
             };
         }
     } catch (error) {
         console.error("Error checking auth status:", error);
         return {
             isAuthenticated: false,
-            userName: 'User'
+            userName: 'User',
+            userMail: 'User@gmail.com',
+            isAdmin: false
         };
     }
 }
+
+function updateAdminElements() {
+    const createEventBtn = document.getElementById('createEventBtn');
+    const adminPanel = document.getElementById('adminPanel');
+    const adminMenuItems = document.querySelectorAll('.admin-only');
+    
+    if (IS_ADMIN) {
+        // Show admin elements
+        if (createEventBtn) {
+            createEventBtn.style.display = 'block';
+            console.log("Create Event button shown for admin user");
+        }
+        if (adminPanel) {
+            adminPanel.style.display = 'block';
+        }
+        adminMenuItems.forEach(item => {
+            item.style.display = 'block';
+        });
+        
+        // Add admin badge to user name if needed
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        if (userNameDisplay && !userNameDisplay.textContent.includes('(Admin)')) {
+            userNameDisplay.textContent = USER_NAME + ' (Admin)';
+        }
+    } else {
+        // Hide admin elements
+        if (createEventBtn) {
+            createEventBtn.style.display = 'none';
+            console.log("Create Event button hidden for non-admin user");
+        }
+        if (adminPanel) {
+            adminPanel.style.display = 'none';
+        }
+        adminMenuItems.forEach(item => {
+            item.style.display = 'none';
+        });
+    }
+}
+
 
 async function initializePage() {
     // Check for auth success parameter
@@ -138,17 +185,24 @@ async function initializePage() {
     const authStatus = await checkAuthStatus();
     const isLoggedIn = authStatus.isAuthenticated;
     USER_NAME = authStatus.userName;
+    USER_MAIL = authStatus.userMail;
+    IS_ADMIN = authStatus.isAdmin;
 
-    console.log("Auth status:", isLoggedIn, "User:", USER_NAME);
+    console.log("Auth status:", isLoggedIn, "User:", USER_NAME, "Admin:", IS_ADMIN);
 
     if (isLoggedIn) {
         // If the user is logged in, show the Logout button and hide the Sign In button.
         if(loginBtn) loginBtn.style.display = 'none';
         if(logoutBtn) logoutBtn.style.display = 'flex';
+
+        updateAdminElements();
     } else {
         // If the user is not logged in, show the Sign In button and hide the Logout button.
         if(loginBtn) loginBtn.style.display = 'flex';
         if(logoutBtn) logoutBtn.style.display = 'none';
+
+        IS_ADMIN = false;
+        updateAdminElements();
     }
 
     // Remove the old loadUserInfo function call since we're now doing it above
@@ -166,6 +220,9 @@ async function initializePage() {
 
             console.log("Logout response:", response);
 
+            IS_ADMIN = false;
+            updateAdminElements();
+
             // Redirect regardless of response
             setTimeout(() => {
                 window.location.href = "http://localhost:5501/src/index.html";
@@ -178,17 +235,25 @@ async function initializePage() {
         }
     }
 
-    // Add logout event listener
-    logoutBtn.addEventListener("click", handleLogout);
+    if(logoutBtn) {
+        logoutBtn.addEventListener("click", handleLogout);
+    }
+
+    // Add create event button listener for admins
+    const createEventBtn = document.getElementById('createEventBtn');
+    if (createEventBtn) {
+        createEventBtn.addEventListener('click', function() {
+            if (IS_ADMIN) {
+                // Redirect to create event page or open create event modal
+                window.location.href = 'create-event.html'; // or openCreateEventModal();
+            } else {
+                alert('Access denied. Admin privileges required.');
+            }
+        });
+    }
 
     updateBanner();
 
-    // Rest of your existing initialization code...
-    // const bannerImg = document.querySelector('.banner img');
-    // if (bannerImg) {
-    //     bannerImg.src = bannerEvent.image;
-    //     bannerImg.alt = bannerEvent.title;
-    // }
 
     const bannerBtn = document.getElementById('bannerViewMore');
     if(bannerBtn) {
@@ -234,7 +299,13 @@ const addedEvents = new Set();
 function updateGreeting() {
   const now = new Date();
   const hour = now.getHours();
-  const userName = USER_NAME + "!";
+  let userName = USER_NAME;
+
+  if (IS_ADMIN) {
+        userName = USER_NAME + " (Admin)";
+  }
+
+  userName += "!";
   let greeting = '';
   
   if (hour < 12) {
@@ -313,6 +384,17 @@ function openModal(event) {
   // Set modal button state based on calendar
   const modalBtn = modal.querySelector('.add-to-calendar-btn');
   syncButtonState(modalBtn, addedEvents.has(event.title));
+
+  // Show admin-only modal buttons if user is admin
+  const editEventBtn = modal.querySelector('.edit-event-btn');
+  const deleteEventBtn = modal.querySelector('.delete-event-btn');
+  
+  if (editEventBtn) {
+      editEventBtn.style.display = IS_ADMIN ? 'inline-block' : 'none';
+  }
+  if (deleteEventBtn) {
+      deleteEventBtn.style.display = IS_ADMIN ? 'inline-block' : 'none';
+  }
 
   modal.style.display = 'block';
   document.body.style.overflow = 'hidden'; // Prevent background scrolling
