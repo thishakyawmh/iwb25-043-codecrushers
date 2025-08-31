@@ -305,7 +305,6 @@ function updateGreeting() {
         userName = USER_NAME + " (Admin)";
   }
 
-  userName += "!";
   let greeting = '';
   
   if (hour < 12) {
