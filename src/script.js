@@ -406,6 +406,59 @@ function closeModal() {
   document.body.style.overflow = 'auto'; // Restore scrolling
 }
 
+function showPopup(title, message, redirectUrl = null) {
+  console.log("showPopup called"); // Debug log
+  const overlay = document.getElementById('customPopup');
+  if (!overlay) {
+    console.error("Popup container not found!");
+    return;
+  }
+
+  // Create the popup box if it doesn't exist
+  if (!overlay.querySelector('.popup-box')) {
+    overlay.innerHTML = `
+      <div class="popup-box" role="dialog" aria-modal="true">
+        <button class="popup-close" type="button" aria-label="Close">×</button>
+        <h3 id="popupTitle">${title}</h3>
+        <p id="popupMessage">${message}</p>
+        <div class="popup-actions">
+          <button class="btn btn-primary" type="button" id="popupOkBtn">OK</button>
+        </div>
+      </div>
+    `;
+  } else {
+    // Update existing popup content
+    overlay.querySelector('#popupTitle').textContent = title;
+    overlay.querySelector('#popupMessage').textContent = message;
+  }
+
+  // Make sure the overlay is visible
+  overlay.style.display = 'flex';
+  overlay.style.zIndex = '99999';
+
+  // Define the close function
+  const closePopup = () => {
+    overlay.style.display = 'none';
+    if (redirectUrl) window.location.href = redirectUrl;
+    console.log("Popup closed"); // Debug log
+  };
+
+  // Attach one-time listeners to close buttons
+  const closeBtn = overlay.querySelector('.popup-close');
+  const okBtn = overlay.querySelector('#popupOkBtn');
+
+  closeBtn.addEventListener('click', closePopup, { once: true });
+  okBtn.addEventListener('click', closePopup, { once: true });
+
+  // Close popup if clicking outside the popup box
+  overlay.addEventListener('click', function handler(e) {
+    if (e.target === overlay) {
+      closePopup();
+      overlay.removeEventListener('click', handler);
+    }
+  }, { once: true });
+}
+
 async function addToCalendar() {
     console.log(currentModalEvent);
 
@@ -427,7 +480,7 @@ async function addToCalendar() {
         });
 
         if (response.ok) {
-            alert("Event added to your Google Calendar successfully!");
+            showPopup("Success", "Event added to your Google Calendar successfully!");
             addedEvents.add(currentModalEvent.title);
             // Visually update buttons
             const modalBtn = document.querySelector('#eventModal .add-to-calendar-btn');
@@ -436,11 +489,11 @@ async function addToCalendar() {
             if(cardBtn) syncButtonState(cardBtn, true);
         } else {
              const errorData = await response.json();
-             alert(`Failed to add event: ${errorData.body || 'Please make sure you are logged in.'}`);
+             showPopup("Error", `Failed to add event: ${errorData.body || "Please make sure you are logged in."}`);
         }
     } catch (error) {
         console.error("Error adding event to calendar:", error);
-        alert("An error occurred. Could not add event to calendar.");
+        showPopup("Error", "An error occurred. Could not add event to calendar.");
     }
 
     const modalBtn = document.querySelector('#eventModal .add-to-calendar-btn');
