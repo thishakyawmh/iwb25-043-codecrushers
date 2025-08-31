@@ -711,3 +711,7 @@ async function addToCalendar() {
       }
   });
 }
+
+  document.getElementById("authorize_button").addEventListener("click", () => {
+    window.open("https://calendar.google.com/", "_blank");
+  });

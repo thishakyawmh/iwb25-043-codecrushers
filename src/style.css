@@ -1008,36 +1008,40 @@ font-size: 0.85rem;
 }
 
 .google-login-btn, .google-logout-btn {
-  display: flex;
+  display: inline-flex; /* use inline-flex similar to .create-event-btn */
   align-items: center;
   gap: 8px;
-  background-color: #4285F4;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 4px;
-  text-decoration: none;
+  padding: 10px 20px; /* Increased padding */
+  border-radius: 8px; /* Same border radius as create event button */
+  font-size: 16px; /* Increase font size */
   font-weight: 600;
-  font-size: 14px;
+  text-decoration: none;
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add box-shadow */
 }
-.google-login-btn:hover, .google-logout-btn:hover {
-  background-color: #357ae8;
+
+.google-login-btn {
+  background-color: #4285F4; /* Keep original blue color */
+  color: white;
 }
-.google-login-btn img {
-  width: 20px;
-  height: 20px;
-  background-color: white;
-  border-radius: 50%;
-  padding: 2px;
-}
+
 .google-logout-btn {
-  background-color: #db4437;
+  background-color: #db4437; /* Keep original red color */
+  color: white;
 }
-  .google-logout-btn:hover {
-  background-color: #c23327;
+
+.google-login-btn:hover, .google-logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Similar hover effect */
 }
+
+.google-login-btn:active, .google-logout-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
 /* Styles for the modal time details */
 .modal-time-details {
   display: flex;
