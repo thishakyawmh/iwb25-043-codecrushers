@@ -626,22 +626,6 @@ async function addToCalendar() {
         showPopup("Error", "An error occurred. Could not add event to calendar.");
     }
 
-    const modalBtn = document.querySelector('#eventModal .add-to-calendar-btn');
-    const eventTitle = document.getElementById('modalEventTitle').textContent;
-    const isCurrentlyAdded = addedEvents.has(eventTitle);
-    if (isCurrentlyAdded) {
-      addedEvents.delete(eventTitle);
-    } else {
-      addedEvents.add(eventTitle);
-    }
-    // Update modal button state
-    syncButtonState(modalBtn, !isCurrentlyAdded);
-
-    // Update corresponding card button
-    const cardBtn = document.querySelector(`.card-calendar-btn[data-title="${eventTitle}"]`);
-    if(cardBtn){
-      syncButtonState(cardBtn, !isCurrentlyAdded);
-    }
   }
 
   function syncButtonState(btn, isAdded){

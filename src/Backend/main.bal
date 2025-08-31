@@ -28,6 +28,7 @@ final mongodb:Client mongoDb = check new ({
 });
 
 final string[] & readonly ADMIN_EMAILS = [
+    "thishakyawmh@gmail.com",
     "savindumarapana@gmail.com",
     "hirunthishakya.wmh25@gmail.com",
     "tharushatheekshana25@gmail.com"
