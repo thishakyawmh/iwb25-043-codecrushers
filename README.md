@@ -112,7 +112,7 @@ To handle Google Sign-In and Calendar integration, you need to set up a project 
     *   Add your copied Client ID and Client Secret to this file. It should look like this:
         <br>clientId="YOUR_CLIENT_ID_HERE"<br>clientSecret="YOUR_CLIENT_SECRET_HERE"
         
-2.  Set Admin Privileges (Optional):
+2.  Set Admin Privileges:
     
     *   If you want to test the admin features (like creating events), open the main.bal file.
         
