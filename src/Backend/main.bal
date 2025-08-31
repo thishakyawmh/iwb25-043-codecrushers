@@ -267,11 +267,28 @@ service / on new http:Listener(9090) {
         }
 
         do {
+            gcalendar:EventReminder[] remindersList = [
+                {
+                    method: "popup",
+                    minutes: 1440 // 24 hours before
+                },
+                {
+                    method: "popup",
+                    minutes: 30 // 24 hours before
+                }
+            ];
+
+            gcalendar:EventReminders reminders = {
+                useDefault: false, // Don't use default reminders
+                overrides: remindersList
+            };
+
             gcalendar:Event eventData = {
                 summary: payload.summary,
                 description: payload.description,
                 'start: {dateTime: payload.startDateTime},
-                end: {dateTime: payload.endDateTime}
+                end: {dateTime: payload.endDateTime},
+                reminders: reminders
             };
 
             gcalendar:Event createdEvent = check localClient->/calendars/primary/events.post(eventData);
