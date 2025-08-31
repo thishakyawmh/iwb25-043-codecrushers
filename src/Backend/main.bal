@@ -28,7 +28,8 @@ final string[] & readonly ADMIN_EMAILS = [
     "thishakyawmh@gmail.com",
     "savindumarapana@gmail.com",
     "hirunthishakya.wmh25@gmail.com",
-    "tharushatheekshana25@gmail.com"
+    "tharushatheekshana25@gmail.com",
+    "hirunthishakya.wmh34@gmail.com"
 ];
 
 isolated function isAdmin(string? userEmail) returns boolean {
