@@ -1,3 +1,11 @@
-# Configuration for the Ballerina backend
-clientId="YOUR_CLIENT_ID_HERE"
-clientSecret="YOUR_CLIENT_SECRET_HERE"
+# Configuration for the Univents Ballerina backend.
+# Copy this file to Config.toml and replace all placeholder values.
+clientId = "YOUR_GOOGLE_OAUTH_CLIENT_ID"
+clientSecret = "YOUR_GOOGLE_OAUTH_CLIENT_SECRET"
+redirectUrl = "http://localhost:9090/oauth2/callback"
+frontendOrigin = "http://localhost:5501"
+adminEmails = ["admin@example.com"]
+
+# Configure host/port for your MongoDB deployment in Config.toml when needed.
+host = "localhost"
+port = 27017
