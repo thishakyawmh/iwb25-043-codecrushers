@@ -26,8 +26,6 @@ public type EventUpdate record {|
     string startTime?;
     string endTime?;
     string description?;
-    string createdBy?;
-    string createdByName?;
 |};
 
 public type Event record {|

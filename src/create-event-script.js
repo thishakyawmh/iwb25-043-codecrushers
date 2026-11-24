@@ -50,6 +50,7 @@ document.getElementById('createEventForm').addEventListener('submit', function(e
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify(eventData),
         })
         .then(response => {

@@ -10,6 +10,8 @@ configurable int port = 27017;
 configurable string clientId = ?;
 configurable string clientSecret = ?;
 configurable string redirectUrl = "http://localhost:9090/oauth2/callback";
+configurable string frontendOrigin = "http://localhost:5501";
+configurable string[] adminEmails = [];
 
 gcalendar:Client? calendarClient = ();
 string? currentUserName = ();
@@ -24,17 +26,12 @@ final mongodb:Client mongoDb = check new ({
     }
 });
 
-final string[] & readonly ADMIN_EMAILS = [
-    "your.admin.email@gmail.com",
-    "your.admin.email2@gmail.com"
-];
-
 isolated function isAdmin(string? userEmail) returns boolean {
     if userEmail is () {
         return false;
     }
 
-    foreach string adminEmail in ADMIN_EMAILS {
+    foreach string adminEmail in adminEmails {
         if adminEmail.equalsIgnoreCaseAscii(userEmail) {
             return true;
         }
@@ -44,7 +41,7 @@ isolated function isAdmin(string? userEmail) returns boolean {
 
 @http:ServiceConfig {
     cors: {
-        allowOrigins: ["*"],
+        allowOrigins: [frontendOrigin],
         allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowHeaders: ["Content-Type", "Authorization"],
         allowCredentials: true,
@@ -130,7 +127,21 @@ service on new http:Listener(9091) {
         return id;
     }
 
-    resource function put events/[string id](EventUpdate update) returns Event|error {
+    resource function put events/[string id](EventUpdate update) returns Event|http:Unauthorized|error {
+        string|() currentUserEmail;
+        lock {
+            currentUserEmail = currentUserMail;
+        }
+
+        if currentUserEmail is () {
+            return <http:Unauthorized>{body: "User not authenticated"};
+        }
+
+        Event existingEvent = check getEvent(self.Univents, id);
+        if existingEvent.createdBy != currentUserEmail && !isAdmin(currentUserEmail) {
+            return <http:Unauthorized>{body: "Access denied: You cannot update this event"};
+        }
+
         mongodb:Collection events = check self.Univents->getCollection("Events");
         mongodb:UpdateResult updateResult = check events->updateOne({id}, {set: update});
         if updateResult.modifiedCount != 1 {
@@ -154,7 +165,7 @@ isolated function getEvent(mongodb:Database Univents, string id) returns Event|e
 
 @http:ServiceConfig {
     cors: {
-        allowOrigins: ["*"],
+        allowOrigins: [frontendOrigin],
         allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowHeaders: ["Content-Type", "Authorization"],
         allowCredentials: true,
@@ -256,7 +267,7 @@ service / on new http:Listener(9090) {
     }
 
     resource function get oauth2/callback(string code) returns http:TemporaryRedirect|http:InternalServerError|error {
-        log:printInfo("Received authorization code from Google", authCode = code);
+        log:printInfo("Received Google OAuth callback");
 
         // FIX: Properly handle the client creation with error handling
         http:Client tokenClient = check new ("https://oauth2.googleapis.com");
