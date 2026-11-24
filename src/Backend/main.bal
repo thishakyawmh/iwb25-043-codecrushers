@@ -165,7 +165,7 @@ isolated function getEvent(mongodb:Database Univents, string id) returns Event|e
 
 @http:ServiceConfig {
     cors: {
-        allowOrigins: ["*"],
+        allowOrigins: [frontendOrigin],
         allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowHeaders: ["Content-Type", "Authorization"],
         allowCredentials: true,
