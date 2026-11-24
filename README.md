@@ -167,3 +167,12 @@ The backend is configured to redirect to a specific frontend URL after a success
     *   Your browser should open to the Univents homepage.
         
     *   You can now sign in with the Google account you added as a test user. If you configured an admin email, you will see the "Create Event" button and have the ability to post new events.
+
+
+## Configuration and security status
+
+Copy `src/Backend/example.config.toml` to `src/Backend/Config.toml` and configure the Google OAuth client, frontend origin, and explicit administrator email allowlist. Never commit the real OAuth client secret or production configuration.
+
+The backend currently keeps the signed-in user's name, email, and Google Calendar client in process-wide mutable variables. That state is shared across all browser sessions and is not a safe multi-user session implementation. OAuth state/CSRF protection and a per-user server-side session store are also still required. **Treat this repository as a local academic prototype only; do not deploy it as a public production service or rely on the current login flow for real authorization.**
+
+The CORS policy now uses an explicit configured frontend origin instead of a wildcard, and event updates now require a signed-in event creator or configured administrator. These are partial safeguards; they do not resolve the shared-session issue above.
